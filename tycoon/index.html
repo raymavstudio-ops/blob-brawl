@@ -122,6 +122,7 @@ body.playing #hud{display:block}
 #rotate .ph{font-size:76px;animation:rot 1.6s ease-in-out infinite;-webkit-text-stroke:0}
 @keyframes rot{0%,100%{transform:rotate(0)}50%{transform:rotate(-90deg)}}
 @media (orientation:portrait){body.playing.touch #rotate{display:flex}}
+@media (max-width:540px){#cats{max-width:calc(100vw - 12px);overflow-x:auto;scrollbar-width:none}#cats .ib{width:50px;height:46px}#top{flex-wrap:wrap}}
 #toast{position:fixed;left:50%;top:14px;transform:translateX(-50%) translateY(-120px);background:#fff;border:3px solid var(--ink);box-shadow:0 4px 0 var(--ink);padding:7px 16px;border-radius:16px;z-index:50;transition:transform .25s cubic-bezier(.3,1.6,.5,1);max-width:90vw;text-align:center;font-size:15px;pointer-events:none}
 #toast.on{transform:translateX(-50%) translateY(0)}
 #loading{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:60;background:linear-gradient(#5ec2ff,#c9f0ff);font:400 34px 'Lilita One';color:#fff;-webkit-text-stroke:2px var(--ink);paint-order:stroke fill}
@@ -340,7 +341,7 @@ const THOUGHTS=[b=>`I want to go on the ${b}!`,()=>"I'm hungry!",()=>"I'm thirst
 const INK=0x1d1b3a;
 const glc=$('gl');
 const renderer=new THREE.WebGLRenderer({canvas:glc,antialias:true,powerPreference:'high-performance'});
-const DPR=()=>Math.min(devicePixelRatio||1,innerWidth<1000?1.5:2);
+const DPR=()=>Math.min(devicePixelRatio||1,innerWidth>1200?1.25:1.5);
 renderer.setPixelRatio(DPR());renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 const scene=new THREE.Scene();
 const camera=new THREE.PerspectiveCamera(40,1,.5,900);
@@ -476,16 +477,23 @@ RB.haunted=(m,bd)=>{const T=m.T,cz=-.5;pad(m,6,6);m.rbox('base',4.4,3,3.6,0,0,cz
  m.box('base',.5,.7,.1,-1.4,3.2,cz+.58,0xffe36b,0,true);m.cyl('base',.04,.04,1.2,1.7,3.2,cz,0x222222,5);
  for(let i=0;i<3;i++){const g='bt'+i;m.grp(g,0,5.2,cz,true);m.rbox(g,.5,.12,.2,0,0,0,0x222233,0,.04);m.boxc(g,.5,.05,.18,-.4,.05,0,0x222233,0,0,.4);m.boxc(g,.5,.05,.18,.4,.05,0,0x222233,0,0,-.4)}};
 RA.haunted=(G,s)=>{for(let i=0;i<3;i++){const t=s.t*1.2+i*2.1,g=G['bt'+i];g.position.set(Math.sin(t)*1.9,5+Math.sin(t*2.3+i)*.4,-.5+Math.cos(t)*1.9);g.rotation.y=t+Math.PI/2;g.rotation.z=Math.sin(s.t*14+i)*.35}};
-RB.flume=(m,bd)=>{const T=m.T;pad(m,8,6);const P=[[-2.5,1.0,.45],[2.5,1.0,.45],[2.5,-.2,.45],[2.5,-1.9,3.3],[-.8,-1.9,3.3],[-2.5,-1.2,.45],[-2.5,1.0,.45]];m.path=P;
- for(let i=0;i<P.length-1;i++){const a=P[i],b=P[i+1],dx=b[0]-a[0],dz=b[2-0]-a[2-0];}
- for(let i=0;i<P.length-1;i++){const a=P[i],b=P[i+1],dx=b[0]-a[0],dz=b[1]-a[1],dy=b[2]-a[2],hl=Math.hypot(dx,dz),len=Math.hypot(hl,dy),yaw=Math.atan2(dx,dz),pit=-Math.atan2(dy,hl),mx=(a[0]+b[0])/2,mz=(a[1]+b[1])/2,my=(a[2]+b[2])/2;
-  m.boxc('base',1.5,.3,len+.5,mx,my,mz,T.c,pit,yaw);m.boxc('base',1.1,.1,len+.4,mx,my+.17,mz,T.water||0x59c8ff,pit,yaw);
-  if(my>1){for(const t of[0,1]){const px=a[0]+dx*t,pz=a[1]+dz*t,py=a[2]+dy*t;if(py>1)m.cyl('base',.14,.14,py-.15,px,0,pz,T.d,8)}}}
- m.grp('log');m.rbox('log',.95,.45,1.7,0,0,0,WOOD,0,.2);m.sph('log',.1,-.3,.45,.4,0x222222);m.rbox('log',.8,.15,.4,0,.4,-.2,0x8a5a2b,0,.05);m.seat('log',0,.55,-.1);
- m.cyl('base',1.1,1.1,.05,-3.2,.0,1.0,T.b,10)};
+RB.flume=(m,bd)=>{const T=m.T;pad(m,8,6);const WAT=T.water||0x59c8ff;
+ const P=[[-3,1.6,.45],[3,1.6,.45],[3,-.6,.45],[3,-2.3,3.3],[.2,-2.3,3.3],[-1.2,-2.25,3.0],[-2.1,-2.0,2.05],[-2.7,-1.4,1.0],[-3,-.6,.45],[-3,1.6,.45]];m.path=P;
+ /* lagoon under the drop + splash foam */
+ m.cyl('base',1.25,1.3,.06,-2.5,0,-.5,0x4fc0f5,18);for(const[x,z,r]of[[-2.9,-1.0,.22],[-2.3,-.9,.18],[-3.2,-.3,.16],[-2.6,-.4,.2]])m.sph('base',r,x,.32,z,0xffffff,1,.8,1,false,8);
+ for(let i=0;i<P.length-1;i++){const a=P[i],b=P[i+1],dx=b[0]-a[0],dz=b[1]-a[1],dy=b[2]-a[2],hl=Math.hypot(dx,dz),len=Math.hypot(hl,dy),yaw=Math.atan2(dx,dz),sl=Math.atan2(dy,hl),pit=-sl,mx=(a[0]+b[0])/2,mz=(a[1]+b[1])/2,my=(a[2]+b[2])/2;
+  const rx=Math.cos(yaw),rz=-Math.sin(yaw),ux=-Math.sin(yaw)*Math.sin(sl),uy=Math.cos(sl),uz=-Math.cos(yaw)*Math.sin(sl);
+  m.boxc('base',1.7,.22,len+.3,mx,my,mz,0x8a5a2b,pit,yaw);
+  m.boxc('base',1.28,.1,len+.34,mx+ux*.12,my+uy*.12,mz+uz*.12,WAT,pit,yaw);
+  for(const sd of[-1,1])m.boxc('base',.2,.5,len+.3,mx+rx*sd*.78+ux*.22,my+uy*.22,mz+rz*sd*.78+uz*.22,WOOD,pit,yaw);
+  if(my>1){for(const t of[0,.5,1]){const px=a[0]+dx*t,pz=a[1]+dz*t,py=a[2]+dy*t;if(py>1)m.cyl('base',.14,.16,py-.2,px,0,pz,T.d,8)}}}
+ m.grp('log');m.cylc('log',.4,1.7,0,.36,0,WOOD,Math.PI/2,0,0,14);
+ for(const z of[-.86,.86])m.cylc('log',.33,.05,0,.36,z,0xf0cf94,Math.PI/2,0,0,14);
+ for(const z of[-.45,.45])m.tor('log',.4,.04,0,.36,z,0x5a3a1c,0,0,0,16);
+ m.rbox('log',.66,.1,1.1,0,.66,0,0x6a4020,0,.04);m.rbox('log',.6,.16,.3,0,.7,-.1,0xd49a5a,0,.05);m.rbox('log',.5,.22,.3,0,.45,.82,0xd49a5a,0,.1);m.seat('log',0,.7,-.1)};
 RA.flume=(G,s,m)=>{const P=m.path,L=[];let tot=0;for(let i=0;i<P.length-1;i++){const d=Math.hypot(P[i+1][0]-P[i][0],P[i+1][1]-P[i][1],P[i+1][2]-P[i][2]);L.push(d);tot+=d}
  let d=((s.a*.8)%1)*tot,i=0;while(i<L.length-1&&d>L[i]){d-=L[i];i++}const a=P[i],b=P[i+1],t=d/L[i],hl=Math.hypot(b[0]-a[0],b[1]-a[1]);
- G.log.position.set(lerp(a[0],b[0],t),lerp(a[2],b[2],t)+.12,lerp(a[1],b[1],t));G.log.rotation.set(-Math.atan2(b[2]-a[2],hl),Math.atan2(b[0]-a[0],b[1]-a[1]),0,'YXZ');G.log.visible=s.sp>.05||true};
+ G.log.position.set(lerp(a[0],b[0],t),lerp(a[2],b[2],t)+.17,lerp(a[1],b[1],t));G.log.rotation.set(-Math.atan2(b[2]-a[2],hl),Math.atan2(b[0]-a[0],b[1]-a[1]),0,'YXZ');G.log.visible=s.sp>.05||true};
 RB.pirate=(m,bd)=>{const T=m.T,py=5;pad(m,8,6);const cz=-.3;
  for(const z of[-1.2,1.2]){for(const sx of[-1,1])m.boxc('base',.24,Math.hypot(2.4,py),.24,sx*1.2,py/2,cz+z,T.d,0,0,sx*Math.atan2(2.4,py));m.sph('base',.2,0,py,cz+z,T.c)}
  m.cylc('base',.1,2.4,0,py,cz,0x888899,Math.PI/2);m.grp('ship',0,py,cz);m.cylc('ship',.1,2.9,0,py,cz,0x888899,Math.PI/2);

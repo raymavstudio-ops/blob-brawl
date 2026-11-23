@@ -89,6 +89,7 @@ body.playing #hud{display:block}
 #objPill{font:600 13px 'Fredoka'}
 #hint{font:600 13px 'Fredoka';background:#fff2b8;border:3px solid var(--ink);border-radius:12px;padding:3px 9px;display:none;max-width:42vw}
 #topR{position:absolute;right:max(8px,env(safe-area-inset-right));top:max(6px,env(safe-area-inset-top));display:flex;gap:6px}
+@media (max-width:520px){#topR{top:calc(max(6px,env(safe-area-inset-top)) + 86px);flex-direction:column}#topL{max-width:80vw}}
 .ib{width:48px;height:48px;border-radius:14px;background:#fff;border:3px solid var(--ink);box-shadow:0 4px 0 var(--ink);font-size:20px;cursor:pointer;padding:0}
 .ib:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
 #preview{position:absolute;left:50%;top:max(6px,env(safe-area-inset-top));transform:translateX(-50%);background:#fff;border:3px solid var(--ink);border-radius:14px;padding:5px 12px;font-size:14px;text-align:center;display:none;box-shadow:0 4px 0 var(--ink);max-width:30vw}
@@ -846,7 +847,7 @@ const R=window.R={ready:false};
 try{
 const INK=0x1d1b3a,glc=$('gl');
 const renderer=new THREE.WebGLRenderer({canvas:glc,antialias:true,powerPreference:'high-performance'});
-renderer.setPixelRatio(Math.min(devicePixelRatio||1,innerWidth<1000?1.5:2));
+renderer.setPixelRatio(Math.min(devicePixelRatio||1,innerWidth>1200?1.25:1.5));
 renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(36,1,.1,300);
 const ov=$('ov'),oc=ov.getContext('2d');
@@ -1159,7 +1160,7 @@ function draw(){if(!built||!B)return;renderer.render(scene,camera);const dpr=ov.
  for(const f of floaters){const[x,y]=proj(f.x,f.y+f.t*.8,f.z),a=Math.min(1,(1.2-f.t)*2),s=f.size*(f.t<.15?1+(.15-f.t)*4:1);oc.globalAlpha=a;oc.font=`400 ${s}px 'Lilita One',Impact,sans-serif`;oc.lineWidth=5;oc.strokeStyle='#1d1b3a';oc.fillStyle=f.col;oc.strokeText(f.txt,x,y);oc.fillText(f.txt,x,y)}oc.globalAlpha=1;
  if(banner.t>0){const k=Math.min(1,banner.t*3,(1.25-banner.t+.001)*5),y=innerHeight*.4;oc.globalAlpha=Math.min(1,banner.t*2);const s=Math.min(innerWidth/9,64)*(.8+.2*Math.min(1,k));oc.font=`400 ${s}px 'Lilita One',Impact,sans-serif`;oc.lineWidth=9;oc.strokeStyle='#1d1b3a';oc.fillStyle=banner.col;oc.strokeText(banner.txt,innerWidth/2,y);oc.fillText(banner.txt,innerWidth/2,y);
   if(banner.sub){oc.font=`400 ${s*.4}px 'Lilita One',sans-serif`;oc.lineWidth=5;oc.fillStyle='#fff';oc.strokeText(banner.sub,innerWidth/2,y+s*.5);oc.fillText(banner.sub,innerWidth/2,y+s*.5)}oc.globalAlpha=1}}
-function resize(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();const dpr=Math.min(devicePixelRatio||1,2);ov.width=w*dpr;ov.height=h*dpr;if(built)fitCamKeep()}
+function resize(){const w=innerWidth,h=innerHeight;renderer.setPixelRatio(Math.min(devicePixelRatio||1,innerWidth>1200?1.25:1.5));renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();const dpr=Math.min(devicePixelRatio||1,innerWidth>1200?1.25:1.5);ov.width=w*dpr;ov.height=h*dpr;if(built)fitCamKeep()}
 function fitCamKeep(){}
 addEventListener('resize',resize);resize();
 /* ================= input ================= */

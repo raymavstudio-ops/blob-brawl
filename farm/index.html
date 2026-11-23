@@ -142,6 +142,7 @@ body.touch .hs .k{display:none}
 #rotate .ph{font-size:76px;animation:rot 1.6s ease-in-out infinite;-webkit-text-stroke:0}
 @keyframes rot{0%,30%{transform:rotate(0)}70%,100%{transform:rotate(-90deg)}}
 @media (orientation:portrait){body.touch.playing #rotate{display:flex}}
+@media (max-width:440px){#hot{transform:translateX(-50%) scale(.78);transform-origin:50% 100%}}
 #lvlpop{position:fixed;left:50%;top:30%;transform:translate(-50%,-50%);z-index:31;display:none;text-align:center;pointer-events:none}
 #lvlpop.on{display:block;animation:lv 2.4s ease-out forwards}
 #lvlpop b{font:400 54px 'Lilita One',sans-serif;color:var(--yellow);-webkit-text-stroke:3px var(--ink);paint-order:stroke fill;text-shadow:0 5px 0 var(--ink);display:block}
@@ -527,7 +528,7 @@ function applyResult(r,opts={}){if(!r)return r;if(r.msg&&!r.ok)toast(r.msg);if(r
 const G={mode:'title',t:0,ui:null,fish:null,lock:0,inside:false};
 const glc=$('gl');
 const renderer=new THREE.WebGLRenderer({canvas:glc,antialias:true,powerPreference:'high-performance'});
-const prCap=()=>Math.min(devicePixelRatio||1,innerWidth<1000?1.5:2);
+const prCap=()=>Math.min(devicePixelRatio||1,innerWidth>1200?1.25:1.5);
 renderer.setPixelRatio(prCap());
 renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 const scene=new THREE.Scene();
