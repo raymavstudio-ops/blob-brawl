@@ -1,7 +1,7 @@
 {
-  "name": "Blob Brawl",
-  "short_name": "Blob Brawl",
-  "description": "Cartoon party brawl for 2-4 players: blast, tag and hide.",
+  "name": "Blob Arcade",
+  "short_name": "Blob Arcade",
+  "description": "Cartoon party games for friends: brawl, race, catch critters and sumo.",
   "start_url": "./",
   "scope": "./",
   "display": "fullscreen",
@@ -9,7 +9,18 @@
   "background_color": "#5ec2ff",
   "theme_color": "#5ec2ff",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
-  ]
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "id": "./"
 }
