@@ -1296,7 +1296,7 @@ const camT=new THREE.Vector3(),camBase={d:30,zc:0},EL=1.13;
 const tmpV=new THREE.Vector3();
 function camAt(d,zc,yaw=0,el=EL){camera.position.set(Math.sin(yaw)*Math.cos(el)*d,Math.sin(el)*d,zc+Math.cos(yaw)*Math.cos(el)*d);camT.set(0,0,zc);camera.lookAt(camT);camera.updateMatrixWorld()}
 function fitCam(){
-  const w=innerWidth,h=innerHeight;renderer.setPixelRatio(Math.min(devicePixelRatio||1,w<1000?1.5:2));renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();
+  const w=innerWidth,h=innerHeight;renderer.setPixelRatio(Math.min(devicePixelRatio||1,w>1200?1.25:1.5));renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();
   const top=1-(h<500?58:66)/h*2,bot=-1+10/h*2,xl=1-10/w*2;
   const pts=[];for(const sx of[-1,1])for(const sz of[-1,1])for(const y of[0,.3])pts.push([sx*(BW/2+.85),y,sz*(BH/2+.85)]);
   const range=(d,zc)=>{camAt(d,zc);let x0=9,x1=-9,y0=9,y1=-9;for(const p of pts){tmpV.set(p[0],p[1],p[2]).project(camera);x0=Math.min(x0,tmpV.x);x1=Math.max(x1,tmpV.x);y0=Math.min(y0,tmpV.y);y1=Math.max(y1,tmpV.y)}return{x0,x1,y0,y1}};
@@ -1305,7 +1305,7 @@ function fitCam(){
     let lo=5,hi=150;for(let k=0;k<26;k++){const mid=(lo+hi)/2,r=range(mid,zc);const fits=r.x0>=-xl&&r.x1<=xl&&(r.y1-r.y0)<=(top-bot);if(fits)hi=mid;else lo=mid}
     d=hi;const r=range(d,zc),mid=(r.y0+r.y1)/2,want=(top+bot)/2;zc-=(mid-want)*BH*.45;
   }
-  camBase.d=d;camBase.zc=zc;camAt(d,zc);
+  camBase.d=d;camBase.zc=zc;scene.fog.near=Math.max(40,d*1.2);scene.fog.far=Math.max(95,d*2.8);camera.far=Math.max(140,d*3.6);camera.updateProjectionMatrix();camAt(d,zc);
 }
 addEventListener('resize',fitCam);addEventListener('orientationchange',()=>setTimeout(fitCam,250));fitCam();
 

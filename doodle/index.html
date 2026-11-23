@@ -148,7 +148,7 @@ body.artist #paper canvas{cursor:crosshair}
 .gains{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;max-width:460px}
 .gn{display:flex;align-items:center;gap:4px;background:#fff;border:2.5px solid var(--ink);border-radius:12px;padding:1px 9px 1px 2px;font-size:14px}
 .gn .av{width:28px;height:30px;animation:none}.gn b{color:#1f9e4a}.gn.z b{color:var(--dim)}
-#banner{position:absolute;left:50%;top:50%;z-index:6;pointer-events:none;font:400 clamp(34px,9vmin,64px) 'Lilita One',sans-serif;color:var(--yellow);-webkit-text-stroke:3px var(--ink);paint-order:stroke fill;text-shadow:0 5px 0 var(--ink);white-space:nowrap;
+#banner{position:absolute;left:50%;top:24%;z-index:6;pointer-events:none;font:400 clamp(34px,9vmin,64px) 'Lilita One',sans-serif;color:var(--yellow);-webkit-text-stroke:3px var(--ink);paint-order:stroke fill;text-shadow:0 5px 0 var(--ink);white-space:nowrap;
   transform:translate(-50%,-50%) rotate(-4deg);display:none}
 #banner.on{display:block;animation:ban 1.7s cubic-bezier(.3,1.6,.5,1) both}
 @keyframes ban{0%{transform:translate(-50%,-50%) scale(.3) rotate(-14deg);opacity:0}15%{transform:translate(-50%,-50%) scale(1.08) rotate(-4deg);opacity:1}80%{transform:translate(-50%,-50%) scale(1) rotate(-4deg);opacity:1}100%{transform:translate(-50%,-80%) scale(.9) rotate(-4deg);opacity:0}}
@@ -967,7 +967,7 @@ $('guess').addEventListener('blur',()=>setTimeout(layout,150));
 
 /* ===================== fx: confetti ===================== */
 const fx=$('fx'),fctx=fx.getContext('2d');let parts=[],fxDirty=false;
-function sizeFx(){const dpr=Math.min(2,devicePixelRatio||1);fx.width=innerWidth*dpr;fx.height=innerHeight*dpr;fctx.setTransform(dpr,0,0,dpr,0,0)}
+function sizeFx(){const dpr=Math.min(innerWidth>1200?1.25:1.5,devicePixelRatio||1);fx.width=innerWidth*dpr;fx.height=innerHeight*dpr;fctx.setTransform(dpr,0,0,dpr,0,0)}
 sizeFx();addEventListener('resize',sizeFx);
 function confetti(x,y,n){const cols=['#ff6fb5','#4cc9ff','#ffd23f','#8be04e','#ffa23f','#b388ff'];
   for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,s=180+Math.random()*420;

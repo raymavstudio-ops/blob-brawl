@@ -161,6 +161,11 @@ body.mBattle #bui{display:block}
 @media (orientation:portrait){body.touch.mWorld #rotate,body.touch.mBattle #rotate{display:flex}}
 #toast{position:fixed;left:50%;top:14px;transform:translateX(-50%) translateY(-120px);background:#fff;border:3px solid var(--ink);box-shadow:0 4px 0 var(--ink);padding:8px 18px;border-radius:16px;z-index:30;transition:transform .25s cubic-bezier(.3,1.6,.5,1);max-width:90vw;text-align:center;pointer-events:none}
 #toast.on{transform:translateX(-50%) translateY(0)}
+#slots{display:flex;gap:6px;margin-top:8px}
+#slots button{flex:1;min-height:48px;font:400 13px 'Lilita One',sans-serif;line-height:1.15;color:var(--ink);background:#fff;border:3px solid var(--ink);border-radius:12px;padding:3px 4px;cursor:pointer;box-shadow:0 3px 0 var(--ink)}
+#slots button small{display:block;font:600 11px Fredoka,sans-serif;color:#6b6890}
+#slots button.sel{background:var(--yellow)}
+#slots button.sel small{color:var(--ink)}
 #titleTop{display:flex;justify-content:flex-start;margin:-6px 0 4px}
 #titleTop .btn{width:auto;margin:0;padding:0 14px;font-size:16px}
 #loading{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;font:400 30px 'Lilita One',sans-serif;color:#fff;-webkit-text-stroke:2px var(--ink);paint-order:stroke fill;z-index:50}
@@ -168,6 +173,7 @@ body.mBattle #bui{display:block}
   #title .card{width:min(780px,100%);display:grid;grid-template-columns:1fr 1fr;gap:4px 18px;align-items:center}
   #title .lcol{grid-row:span 1}
   .card{padding:10px 14px}
+  .tabs{gap:4px;flex-wrap:nowrap}.tab{padding:0 7px;font-size:14px;flex:1 1 auto}
   h1{font-size:50px;transform:rotate(-2deg)}h2{font-size:26px}
   .sub{margin:4px 0 4px;font-size:13px}
   .btn{margin-top:7px;padding:4px 8px;font-size:18px}
@@ -222,6 +228,7 @@ body.mBattle #bui{display:block}
       <h1>CRITTER<br><span>QUEST</span></h1>
       <div class="sub">Catch, train &amp; battle cute critters — with friends!</div>
       <div id="tPics" style="display:flex;justify-content:center;gap:4px;min-height:64px"></div>
+      <div id="slots" role="group" aria-label="Save slots"></div>
     </div>
     <div class="rcol">
       <div id="invite" class="invite" style="display:none">Invited to world <b id="invCode"></b></div>
@@ -351,7 +358,8 @@ const cname=c=>c.nick||SP[c.s].n;
 function movePower(id){const m=MOVES[id];return m.p||0}
 
 /* ================= save ================= */
-const SAVE_KEY='critterquest_save_v1';
+const SAVE_BASE='critterquest_save_v1';let SLOT=1;try{SLOT=Math.min(3,Math.max(1,+localStorage.getItem('cq_slot')||1))}catch(e){}
+const slotKey=n=>n===1?SAVE_BASE:SAVE_BASE+'_s'+n;let SAVE_KEY=slotKey(SLOT);
 let SV=null;
 function newSave(name){return{v:1,name,party:[],box:[],items:{orb:5,superorb:0,potion:3,superpotion:0,revive:0},coins:200,pos:{x:0,z:9},seen:[],caught:[],uid:1,started:false}}
 function sanitize(s){
@@ -443,7 +451,7 @@ const P={x:0,z:9,vx:0,vz:0,yaw:0,moving:false,ci:0};
 /* ================= renderer & materials ================= */
 const glc=$('gl');
 const renderer=new THREE.WebGLRenderer({canvas:glc,antialias:true,powerPreference:'high-performance'});
-const prCap=()=>Math.min(devicePixelRatio||1,innerWidth<1000?1.5:2);
+const prCap=()=>Math.min(devicePixelRatio||1,innerWidth>1200?1.25:1.5);
 renderer.setPixelRatio(prCap());
 renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 const INK=0x1d1b3a;
@@ -1487,6 +1495,12 @@ function goWorld(after){
 function enterGame(after){audio();unlock();let name=$('name').value.trim().slice(0,10)||'Trainer';try{localStorage.setItem('cq_name',name)}catch(e){}
   if(!SV)SV=newSave(name);else SV.name=name;
   if(SV.party.length)startWipe(()=>goWorld(after));else{G.afterStart=after;startWipe(showStarter)}}
+function peekSlot(n){try{const s=JSON.parse(localStorage.getItem(slotKey(n))||'null');if(s&&s.v===1&&Array.isArray(s.party)&&s.party.length)return s}catch(e){}return null}
+function pickSlot(n){SLOT=n;SAVE_KEY=slotKey(n);try{localStorage.setItem('cq_slot',String(n))}catch(e){}
+  SV=loadSave();try{$('name').value=(SV&&SV.name)||localStorage.getItem('cq_name')||''}catch(e){}
+  $('btnPlay').textContent=SV&&SV.party.length?'CONTINUE ('+SV.party.length+' critter'+(SV.party.length>1?'s':'')+')':'NEW ADVENTURE';
+  $('slots').innerHTML=[1,2,3].map(i=>{const s=peekSlot(i);return `<button data-n="${i}" class="${i===n?'sel':''}" aria-label="Save slot ${i}">SLOT ${i}<small>${s?esc(s.name||'Trainer')+' · '+s.party.length+' crit'+(s.party.length>1?'s':''):'Empty'}</small></button>`}).join('')}
+$('slots').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;SFX.click();pickSlot(+b.dataset.n)});
 $('btnPlay').onclick=()=>enterGame();
 $('btnHost').onclick=()=>enterGame(()=>hostGame());
 $('btnJoin').onclick=()=>{const c=$('joinCode').value.toUpperCase().trim();if(!/^[A-Z]{4}$/.test(c)){toast('Enter the 4-letter code');return}enterGame(()=>joinGame(c))};
@@ -1534,9 +1548,7 @@ function frame(t){const dt=(t-last)/1000;last=t;try{update(dt);render()}catch(e)
 /* ================= boot ================= */
 try{
   buildWorld();resize();
-  SV=loadSave();
-  try{$('name').value=(SV&&SV.name)||localStorage.getItem('cq_name')||''}catch(e){}
-  if(SV&&SV.party.length)$('btnPlay').textContent='CONTINUE ('+SV.party.length+' critter'+(SV.party.length>1?'s':'')+')';
+  pickSlot(SLOT);
   const h=location.hash.replace('#','').toUpperCase();if(/^[A-Z]{4}$/.test(h)){inviteCode=h;$('invite').style.display='block';$('invCode').textContent=h;$('btnInvite').style.display='flex';$('joinCode').value=h;$('btnPlay').classList.add('ghost')}
   $('tPics').innerHTML=['embit','sproutle','dribble','zipzap'].map(s=>`<img src="${portrait(s)}" alt="" style="width:64px;height:64px">`).join('');
   setMode('title');$('loading').remove();requestAnimationFrame(frame);

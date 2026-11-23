@@ -1182,7 +1182,7 @@ function fitCam(){
     if(ok){baseDist=d;return}}
   baseDist=60;
 }
-function resize(){const w=innerWidth,h=innerHeight;renderer.setPixelRatio(Math.min(devicePixelRatio||1,w<1000?1.5:2));renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();fitCam();
+function resize(){const w=innerWidth,h=innerHeight;renderer.setPixelRatio(Math.min(devicePixelRatio||1,w>1200?1.25:1.5));renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();fitCam();
   const v=new THREE.Vector2();renderer.getDrawingBufferSize(v);pMat.uniforms.uH.value=v.y}
 addEventListener('resize',resize);addEventListener('orientationchange',()=>setTimeout(resize,250));
 /* ---------- menu demo ---------- */
@@ -1589,6 +1589,7 @@ $('btnShare').onclick=shareLink;$('btnStart').onclick=()=>startGame();$('btnLeav
 $('btnAgain').onclick=()=>{$('results').classList.remove('on');startGame()};
 $('btnNext').onclick=()=>{if(S.li<LEVELS.length-1){S.li++;$('results').classList.remove('on');startGame()}};
 $('btnLobby').onclick=()=>toLobby();
+let arcT=0;$('arc').addEventListener('click',e=>{if(S.ph==='game'&&!$('results').classList.contains('on')){e.preventDefault();const n=performance.now();if(n-arcT<2200){arcT=0;leave()}else{arcT=n;toast('Tap ◀ again to quit to the menu')}}});
 $('botSwitch').onclick=()=>{if(S.role==='host'){S.botFill=!S.botFill;syncBots();sendLobby()}};
 document.querySelectorAll('#segMode button').forEach(b=>b.onclick=()=>{if(S.role==='client')return;S.mode=+b.dataset.v;syncBots();if(S.role==='host')sendLobby();else renderLobby()});
 document.querySelectorAll('#segDiff button').forEach(b=>b.onclick=()=>{if(S.role==='client')return;S.diff=+b.dataset.v;if(S.role==='host')sendLobby();else renderLobby()});
