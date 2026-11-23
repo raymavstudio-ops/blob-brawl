@@ -68,7 +68,7 @@ a.btn{text-align:center;text-decoration:none;box-sizing:border-box}.back{font-si
 .res{display:grid;gap:8px;margin:12px 0}
 .rk{display:flex;align-items:center;gap:12px;padding:9px 14px;border-radius:16px;background:#fff;border:3px solid var(--ink);font-size:19px}
 .rk:first-child{background:var(--yellow);transform:rotate(-1deg);box-shadow:0 4px 0 var(--ink)}
-.rk .n{margin-left:auto;font-family:'Lilita One',sans-serif;font-size:24px;text-align:right}
+.rk .n{margin-left:auto;font-family:'Lilita One',sans-serif;font-size:24px;text-align:right;white-space:nowrap;flex:none}.rk .nm{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rk .n small{display:block;font:600 12px 'Fredoka',sans-serif;color:var(--dim)}
 .rk .m{font-size:26px;width:32px;text-align:center}
 .rk i{width:16px;height:16px;border-radius:50%;background:currentColor;border:2.5px solid var(--ink);flex:none}
@@ -93,7 +93,7 @@ body.playing #hud{display:block}
 #leftLbl{top:max(8px,env(safe-area-inset-top));right:calc(max(10px,env(safe-area-inset-right)) + 58px);height:48px;display:flex;align-items:center}
 #cross{position:absolute;left:50%;top:50%;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 2px var(--ink),inset 0 0 0 2px var(--ink);opacity:.85}
 #cross:after{content:'';position:absolute;left:50%;top:50%;width:4px;height:4px;margin:-2px;border-radius:50%;background:#fff}
-#hint{position:absolute;left:50%;transform:translateX(-50%);bottom:max(12px,env(safe-area-inset-bottom));font:600 14px 'Fredoka',sans-serif;color:var(--ink);background:rgba(255,255,255,.82);border:2.5px solid var(--ink);padding:4px 12px;border-radius:12px;white-space:nowrap;max-width:46vw;overflow:hidden;text-overflow:ellipsis}
+#hint{position:absolute;left:50%;transform:translateX(-50%);bottom:max(12px,env(safe-area-inset-bottom));font:600 14px 'Fredoka',sans-serif;color:var(--ink);background:rgba(255,255,255,.82);border:2.5px solid var(--ink);padding:4px 12px;border-radius:12px;white-space:nowrap;max-width:min(62vw,420px);overflow:hidden;text-overflow:ellipsis}
 #hint:empty{display:none}
 .abtn{pointer-events:auto;position:absolute;border-radius:50%;border:4px solid var(--ink);box-shadow:0 6px 0 var(--ink);font:400 16px 'Lilita One',sans-serif;color:var(--ink);background:#fff;touch-action:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;padding:0}
 .abtn b{font-size:28px;font-weight:400;display:block;margin-bottom:2px}
@@ -133,6 +133,8 @@ body.blind #blind{display:flex}
 @media (max-height:500px) and (orientation:landscape){#lobby .card{width:min(820px,100%);display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:center}#lobby .plist{margin-top:0}
   #menu .card{width:min(720px,100%);display:grid;grid-template-columns:1fr 1fr;gap:4px 18px;align-items:center}#menu .lcol{align-self:center}}
 @media (max-height:390px) and (orientation:landscape){#results .card{width:min(560px,100%)}.res{grid-template-columns:1fr 1fr}.rk:first-child{transform:none}}
+@media (max-height:500px) and (orientation:landscape){#menu{padding-right:max(64px,calc(env(safe-area-inset-right) + 58px))}}
+body.blind #hud{z-index:6}body.blind #hud *{visibility:hidden}body.blind #hud #quit{visibility:visible}
 @media (max-height:420px){h1{font-size:40px!important;line-height:.95}.card .sub{margin:4px 0 2px;font-size:13px}label{margin:4px 0 3px}.btn{padding:4px 8px;margin-top:7px;font-size:18px}input[type=text]{padding:4px 12px}.card{padding:10px 14px}h1{transform:none}.join{margin-top:8px}.join input{padding:5px}.code{font-size:30px}.opt{margin-top:5px}.mode{padding:3px}.mdesc{font-size:12px;margin-top:5px}.plist{margin:6px 0 2px;gap:5px}.pl{padding:4px 10px}.switch{padding:5px 12px;margin-top:5px}
   #timer{font-size:32px}#banner{font-size:40px}#blindT{font-size:70px}#blind .be{font-size:54px}#bMain{width:92px;height:92px}#bLock,#bTaunt{width:72px;height:72px}#bLock{right:calc(max(22px,env(safe-area-inset-right)) + 104px)}#bTaunt{bottom:calc(max(22px,env(safe-area-inset-bottom)) + 104px)}}
 @media (max-height:540px){.res{gap:5px;margin:8px 0}.rk{padding:4px 12px;font-size:16px}.rk .n{font-size:19px}.rk .m{font-size:20px}h2{font-size:28px}.card{padding:12px 16px}.sub{margin:6px 0 6px}.code{font-size:38px}#rcList .rk{padding:3px 10px;font-size:15px}}
@@ -157,7 +159,7 @@ body.blind #blind{display:flex}
   <button id="bTaunt" class="abtn"><b>📣</b>TAUNT</button>
   <div id="joyBase" class="jbase"><div class="jknob"></div></div>
 </div>
-<div id="blind"><div class="be">🙈</div><div id="blindT">20</div><div>NO PEEKING!</div><div class="bs" id="blindS">The hiders are disguising themselves as props…</div></div>
+<div id="blind"><div class="be">🙈</div><div id="blindT">20</div><div>YOU'RE THE SEEKER · NO PEEKING!</div><div class="bs" id="blindS">The hiders are disguising themselves as props…</div></div>
 <div id="banner"></div>
 <button id="mute" aria-label="sound">🔊</button>
 
@@ -452,7 +454,7 @@ function pick(o,d,selfId,max=40,infl=0){
    ====================================================================== */
 const glc=$('gl'),ov=$('ov'),ctx=ov.getContext('2d');
 const renderer=new THREE.WebGLRenderer({canvas:glc,antialias:true,powerPreference:'high-performance'});
-const DPR=()=>Math.min(devicePixelRatio||1,innerWidth<1000?1.5:2);
+const DPR=()=>Math.min(devicePixelRatio||1,innerWidth>1200?1.25:1.5);
 renderer.setPixelRatio(DPR());
 renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 const scene=new THREE.Scene();
@@ -1096,7 +1098,7 @@ function setPhase(ph){
   document.body.classList.toggle('playing',isPlaying());
   if(ph==='final'){buildResults();SFX.end()}
   if(ph==='over')buildRoundCard();
-  if(ph==='hide'&&prev!=='hide'){const m=me();if(m){camSnap(m);banner(m.role===1?'YOU\'RE THE SEEKER!<small>Wait for the hiders…</small>':'HIDE!<small>Become a prop before time runs out</small>',2.4)}}
+  if(ph==='hide'&&prev!=='hide'){const m=me();if(m){camSnap(m);if(m.role!==1)banner('HIDE!<small>Become a prop before time runs out</small>',2.4)}}
   if(isPlaying()){wake();if(document.activeElement&&document.activeElement.blur)document.activeElement.blur()}
   else{joyReset();looks.clear()}
   if(ph==='menu'||ph==='lobby')setSeed(S.seed||7);
@@ -1303,7 +1305,7 @@ function hudUpdate(){
   $('bTaunt').className='abtn'+(m.tauntCd>0||S.ph!=='seek'?' cool':'');setH('bTaunt',m.tauntCd>0?'<b>📣</b>'+Math.ceil(m.tauntCd)+'s':'<b>📣</b>TAUNT');
   let hint='';
   if(S.ph==='over')hint='';
-  else if(seeker){hint=m.dizzy>0?'💫 Dizzy! Wait it out…':m.stun>0?'Getting your mallet…':S.ph==='hide'?'':(IS_TOUCH?'Tap a suspicious prop to bonk it — real props hurt you!':'Click a suspicious prop to bonk it — real props hurt you!')}
+  else if(seeker){hint=m.dizzy>0?'💫 Dizzy! Wait it out…':m.stun>0?'Getting your mallet…':S.ph==='hide'?'':(IS_TOUCH?'Tap a suspicious prop to bonk it!':'Click a suspicious prop to bonk it — real props hurt!')}
   else if(m.type<0)hint=IS_TOUCH?'Tap a prop (or press BECOME) to disguise as it':'Click a prop or press E to disguise as it';
   else if(!m.locked)hint=IS_TOUCH?'Find a spot next to matching props, then LOCK':'Find a spot next to matching props, then press Q to lock';
   else hint=S.ph==='seek'?'Locked & still! TAUNT for bonus points':'Locked! Seekers are coming…';

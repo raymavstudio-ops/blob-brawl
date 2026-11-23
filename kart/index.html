@@ -62,7 +62,7 @@ input[type=text]:focus{background:#fff;box-shadow:0 0 0 4px rgba(76,201,255,.45)
 .row2{display:flex;gap:10px}.row2 .btn{flex:1}
 .btn,input[type=text],.mode,.switch{min-height:48px}
 /* results */
-.podium{display:flex;align-items:flex-end;justify-content:center;gap:8px;margin:8px 0 6px}
+.podium{display:flex;align-items:flex-end;justify-content:center;gap:8px;margin:8px 0 6px;border-bottom:3px solid var(--ink);padding:0 4px}
 .pod{flex:1;max-width:140px;text-align:center;min-width:0}
 .pod .bl{width:34px;height:34px;border-radius:50%;border:3px solid var(--ink);margin:0 auto 3px;position:relative}
 .pod .bl:before,.pod .bl:after{content:'';position:absolute;top:9px;width:7px;height:9px;border-radius:50%;background:#fff;border:2px solid var(--ink)}
@@ -348,7 +348,7 @@ setInterval(musicTick,100);
 
 /* ======================= renderer ======================= */
 const renderer=new THREE.WebGLRenderer({canvas:$('gl'),antialias:true,powerPreference:'high-performance'});
-const PR=()=>Math.min(devicePixelRatio||1,innerWidth<1000?1.5:2);
+const PR=()=>Math.min(devicePixelRatio||1,innerWidth>1200?1.25:1.5);
 renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 const scene=new THREE.Scene();
 const camera=new THREE.PerspectiveCamera(68,1,.3,900); // near .3 (was .1): 3x depth precision, no shimmering of the thin road/dirt/water layers far away

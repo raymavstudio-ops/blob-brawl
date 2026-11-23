@@ -832,7 +832,7 @@ function update(dt){
 /* ================= Three.js cartoon renderer ================= */
 const INK=0x1d1b3a;
 const renderer=new THREE.WebGLRenderer({canvas:$('cv'),antialias:true,powerPreference:'high-performance'});
-const pixelRatio=()=>Math.min(devicePixelRatio||1,innerWidth<1000?1.5:2);
+const pixelRatio=()=>Math.min(devicePixelRatio||1,innerWidth>1200?1.25:1.5);
 renderer.setPixelRatio(pixelRatio());renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(40,1,.1,320);
 function canvasTex(w,h,fn,rep){const c=document.createElement('canvas');c.width=w;c.height=h;fn(c.getContext('2d'),w,h);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=4;if(rep){t.wrapS=t.wrapT=THREE.RepeatWrapping}return t}

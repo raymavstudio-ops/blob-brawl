@@ -86,6 +86,9 @@ body.blast #dashBtn{width:78px;height:78px;font-size:17px;bottom:auto;top:max(64
 #dashBtn:active{transform:translateY(4px);box-shadow:0 2px 0 var(--ink)}
 #dashBtn.cool{filter:grayscale(.85) brightness(.9)}
 #mute{position:fixed;top:max(8px,env(safe-area-inset-top));right:max(10px,env(safe-area-inset-right));width:48px;height:48px;border-radius:14px;background:#fff;border:3px solid var(--ink);box-shadow:0 4px 0 var(--ink);font-size:20px;z-index:5}
+#quit{position:fixed;top:max(8px,env(safe-area-inset-top));right:calc(max(10px,env(safe-area-inset-right)) + 58px);height:48px;min-width:48px;padding:0 10px;border-radius:14px;background:#fff;border:3px solid var(--ink);box-shadow:0 4px 0 var(--ink);font:400 18px 'Lilita One',sans-serif;color:var(--ink);z-index:5;display:none;cursor:pointer}
+body.playing #quit{display:block}
+#quit.sure{background:#ff4d4d;color:#fff}
 #rotate{position:fixed;inset:0;background:linear-gradient(#5ec2ff,#c9f0ff);z-index:20;display:none;align-items:center;justify-content:center;flex-direction:column;text-align:center;gap:14px;font:400 28px 'Lilita One',sans-serif;color:#fff;-webkit-text-stroke:2px var(--ink);paint-order:stroke fill}
 #rotate .ph{font-size:76px;animation:rot 1.6s ease-in-out infinite;-webkit-text-stroke:0}
 @keyframes rot{0%,30%{transform:rotate(0)}70%,100%{transform:rotate(-90deg)}}
@@ -94,8 +97,9 @@ body.blast #dashBtn{width:78px;height:78px;font-size:17px;bottom:auto;top:max(64
 #toast.on{transform:translateX(-50%) translateY(0)}
 .row2{display:flex;gap:10px}.row2 .btn{flex:1}
 .btn,input[type=text],.mode,.switch{min-height:48px}
-@media (max-height:500px) and (orientation:landscape){#lobby .card{width:min(800px,100%);display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:center}#lobby .plist{margin-top:0}}
+@media (max-height:500px) and (orientation:landscape){#menu .card{width:min(720px,100%);display:grid;grid-template-columns:1fr 1.1fr;column-gap:22px;align-items:center}#menu .card>h1{grid-column:1;grid-row:1/span 3;align-self:end;margin:0}#menu .card>.sub{grid-column:1;grid-row:4/span 3;align-self:start;margin:6px 0 0}#menu .card>:not(h1):not(.sub){grid-column:2}#lobby .card{width:min(800px,100%);display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:center}#lobby .plist{margin-top:0}}
 @media (max-height:390px) and (orientation:landscape){#results .card{width:min(560px,100%)}.res{grid-template-columns:1fr 1fr}.rk:first-child{transform:none}}
+@media (max-height:500px) and (orientation:landscape){#menu{padding-right:max(64px,calc(env(safe-area-inset-right) + 58px))}.pl{padding:6px 8px;gap:6px;font-size:14px}.pl small{font-size:11px}}
 @media (max-height:420px){h1{font-size:32px!important;line-height:.95}.card .sub{margin:4px 0 2px;font-size:13px}label{margin:4px 0 3px}.btn{padding:4px 8px;margin-top:7px;font-size:18px}input[type=text]{padding:4px 12px}.card{padding:10px 14px}h1{transform:none}.join{margin-top:8px}.join input{padding:5px}.code{font-size:30px}.modes{margin-top:6px}.mode{padding:5px 4px}.mode .e{font-size:18px}.mdesc{font-size:12px;margin-top:5px}.plist{margin:6px 0 2px;gap:5px}.pl{padding:4px 10px}.switch{padding:5px 12px;margin-top:5px}}
 @media (max-height:540px){.res{gap:5px;margin:8px 0}.rk{padding:4px 12px;font-size:16px}.rk .n{font-size:19px}.rk .m{font-size:20px}h2{font-size:28px}.card{padding:12px 16px}h1{font-size:40px}.sub{margin:6px 0 6px}.code{font-size:38px}.mode .e{font-size:22px}.mdesc{min-height:0}}
 </style>
@@ -110,6 +114,7 @@ body.blast #dashBtn{width:78px;height:78px;font-size:17px;bottom:auto;top:max(64
   <button id="dashBtn">DASH</button>
 </div>
 <button id="mute" aria-label="sound">🔊</button>
+<button id="quit" aria-label="quit game">✕</button>
 
 <div id="menu" class="screen on">
   <div class="card">
@@ -648,6 +653,7 @@ $('btnSolo').onclick=soloGame;
 $('btnShare').onclick=shareLink;
 $('btnStart').onclick=startGame;
 $('btnLeave1').onclick=leave;$('btnLeave2').onclick=leave;
+$('quit').onclick=()=>{const q=$('quit');if(q.classList.contains('sure')){q.classList.remove('sure');q.textContent='✕';leave()}else{q.classList.add('sure');q.textContent='QUIT?';clearTimeout(q.h);q.h=setTimeout(()=>{q.classList.remove('sure');q.textContent='✕'},2500)}};
 $('btnAgain').onclick=()=>{if(S.role==='solo'){setPhase('lobby');renderLobby()}else{S.ph='lobby';syncBots();sendLobby();setPhase('lobby')}};
 $('botSwitch').onclick=()=>{if(S.role==='host'){S.botFill=!S.botFill;syncBots();sendLobby()}};
 $('lobCode').onclick=shareLink;
@@ -717,7 +723,7 @@ function readInput(){
   else if(mouse.seen&&m){
     let wx,wy;
     if(window.R3&&R3.ok){const w=R3.screenToWorld(mouse.x,mouse.y);if(!w)return;wx=w.x;wy=w.y}
-    else{const d=Math.min(devicePixelRatio||1,DPR_CAP);wx=(mouse.x*d-view.ox)/view.sc;wy=(mouse.y*d-view.oy)/view.sc}
+    else{const d=Math.min(devicePixelRatio||1,capDpr());wx=(mouse.x*d-view.ox)/view.sc;wy=(mouse.y*d-view.oy)/view.sc}
     const dx=wx-m.x,dy=wy-m.y,l=Math.hypot(dx,dy);if(l>4){inp.ax=dx/l;inp.ay=dy/l}inp.fire=mouse.down;
   }
   else if(Math.hypot(ix,iy)>.15){const l=Math.hypot(ix,iy);inp.ax=ix/l;inp.ay=iy/l} // not aiming: face where you walk
@@ -741,13 +747,13 @@ function buildBg(){
   g.save();g.shadowColor='#2ee6ff';g.shadowBlur=26;g.strokeStyle='#2ee6ff';g.lineWidth=5;g.strokeRect(2.5,2.5,W-5,H-5);g.restore();
 }
 function rr(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
-const DPR_CAP=IS_TOUCH?1.5:2;
-function resize(){const d=Math.min(devicePixelRatio||1,DPR_CAP);cv.width=Math.round(innerWidth*d);cv.height=Math.round(innerHeight*d)}
+const capDpr=()=>innerWidth>1200?1.25:1.5;
+function resize(){const d=Math.min(devicePixelRatio||1,capDpr());cv.width=Math.round(innerWidth*d);cv.height=Math.round(innerHeight*d)}
 addEventListener('resize',resize);addEventListener('orientationchange',()=>setTimeout(resize,250));resize();buildBg();
 const fog=document.createElement('canvas');fog.width=W/2;fog.height=H/2;const fg=fog.getContext('2d');
 
 // font size in world units that never renders below ~11 CSS px on small phones
-function fs(b){const d=Math.min(devicePixelRatio||1,DPR_CAP);return Math.round(Math.min(b*2,Math.max(b,11*d/view.sc)))}
+function fs(b){const d=Math.min(devicePixelRatio||1,capDpr());return Math.round(Math.min(b*2,Math.max(b,11*d/view.sc)))}
 function shade(c){const n=parseInt(c.slice(1),16);return`rgb(${(n>>16)*.45|0},${(n>>8&255)*.45|0},${(n&255)*.45|0})`}
 function drawPlayer(p,leader){
   const col=p.it&&S.mode==='infect'?'#7dff4d':COLORS[p.ci],{x,y}=p,blast=S.mode==='blast';
@@ -881,7 +887,7 @@ function drawHud(){
 let hud={w:W,h:H};
 function drawGL(dt){
   R3.render(dt);
-  const d=Math.min(devicePixelRatio||1,DPR_CAP);
+  const d=Math.min(devicePixelRatio||1,capDpr());
   ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,cv.width,cv.height);
   if(!(isPlaying()||S.ph==='end'))return;
   view.sc=1e3;
@@ -998,7 +1004,7 @@ const INK=0x1d1b3a;
 const glc=document.createElement('canvas');glc.style.cssText='position:fixed;inset:0;width:100%;height:100%;display:block';
 document.body.insertBefore(glc,document.body.firstChild);
 const renderer=new THREE.WebGLRenderer({canvas:glc,antialias:true,powerPreference:'high-performance'});
-renderer.setPixelRatio(Math.min(devicePixelRatio||1,IS_TOUCH?1.5:2));
+renderer.setPixelRatio(Math.min(devicePixelRatio||1,capDpr()));
 renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 const scene=new THREE.Scene();
 const camera=new THREE.PerspectiveCamera(42,1,.1,200);
@@ -1140,7 +1146,7 @@ const colCache={};const cc=c=>colCache[c]||(colCache[c]=new THREE.Color(c));
 
 /* camera rig */
 const camT=new THREE.Vector3(0,0,0),tmpV=new THREE.Vector3();let darkK=0;
-function resize(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}
+function resize(){const w=innerWidth,h=innerHeight;renderer.setPixelRatio(Math.min(devicePixelRatio||1,capDpr()));renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}
 addEventListener('resize',resize);addEventListener('orientationchange',()=>setTimeout(resize,250));resize();
 const dayFog=new THREE.Color(0xbfeaff),nightFog=new THREE.Color(0x0b1030),dayHemi=new THREE.Color(0xffffff),nightHemi=new THREE.Color(0x4050a0);
 
