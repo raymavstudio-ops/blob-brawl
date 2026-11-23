@@ -119,6 +119,9 @@ body.counting #joyHint{display:block}
 #itemBtn.on{display:block}
 #itemBtn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--ink)}
 #mute{position:fixed;top:max(8px,env(safe-area-inset-top));right:max(10px,env(safe-area-inset-right));width:48px;height:48px;border-radius:14px;background:#fff;border:3px solid var(--ink);box-shadow:0 4px 0 var(--ink);font-size:20px;z-index:8;cursor:pointer;padding:0}
+#quit{position:fixed;top:calc(max(8px,env(safe-area-inset-top)) + 58px);right:max(10px,env(safe-area-inset-right));width:48px;height:48px;border-radius:14px;background:#fff;border:3px solid var(--ink);box-shadow:0 4px 0 var(--ink);font:400 20px 'Lilita One',sans-serif;color:var(--ink);z-index:8;cursor:pointer;padding:0;display:none}
+body.ingame #quit{display:block}
+#quit.arm{background:#ff6b5e;color:#fff}
 #rotate{position:fixed;inset:0;background:linear-gradient(#ffb36b,#ffe7b8);z-index:20;display:none;align-items:center;justify-content:center;flex-direction:column;text-align:center;gap:14px;font:400 28px 'Lilita One',sans-serif;color:#fff;-webkit-text-stroke:2px var(--ink);paint-order:stroke fill}
 #rotate .ph{font-size:76px;animation:rot 1.6s ease-in-out infinite;-webkit-text-stroke:0}
 @keyframes rot{0%,30%{transform:rotate(0)}70%,100%{transform:rotate(-90deg)}}
@@ -130,7 +133,7 @@ body.counting #joyHint{display:block}
   #bnT{font-size:64px;-webkit-text-stroke:6px var(--ink)}#bnS{font-size:19px}#status{font-size:19px;-webkit-text-stroke:4px var(--ink)}
   #dashBtn{width:92px;height:92px;font-size:21px}#itemBtn{width:70px;height:70px;font-size:30px;right:calc(max(24px,env(safe-area-inset-right)) + 104px)}}
 @media (max-height:420px){h1{font-size:34px!important;line-height:.95;transform:none}.card .sub{margin:4px 0 2px;font-size:13px}label{margin:4px 0 3px}.btn{padding:4px 8px;margin-top:7px;font-size:18px}input[type=text]{padding:4px 12px}.card{padding:10px 14px}.join{margin-top:8px}.join input{padding:5px}.code{font-size:30px}.plist{margin:6px 0 2px;gap:5px}.pl{padding:4px 10px}.switch{padding:5px 12px;margin-top:5px}.rules{font-size:12px;padding:5px 10px;margin-top:6px}}
-@media (max-height:540px){.res{gap:5px;margin:8px 0}.rk{padding:4px 12px;font-size:16px}.rk .n{font-size:19px}.rk .m{font-size:20px}h2{font-size:28px}.card{padding:12px 16px}h1{font-size:42px}.sub{margin:6px 0 6px}.code{font-size:38px}}
+@media (max-height:540px){.pl{gap:7px;padding:7px 10px;font-size:15px}.res{gap:5px;margin:8px 0}.rk{padding:4px 12px;font-size:16px}.rk .n{font-size:19px}.rk .m{font-size:20px}h2{font-size:28px}.card{padding:12px 16px}h1{font-size:42px}.sub{margin:6px 0 6px}.code{font-size:38px}}
 @media (max-height:390px){.rk{padding:2px 12px;min-height:0}.rk .n small{display:none}.rk .n{font-size:18px}.rk .m{font-size:18px}.res{margin:6px 0;gap:4px}#results h2{font-size:24px;margin-bottom:2px}#results .btn{margin-top:4px}}
 @media (max-height:500px) and (orientation:landscape){#menu .mL h1{font-size:52px!important;transform:rotate(-3deg)}#menu .mL .sub{font-size:14px}}
 @media (max-width:720px){.chip .nm{max-width:52px}.chip{padding:2px 6px 2px 4px;gap:4px}#chips{gap:4px}}
@@ -154,6 +157,7 @@ body.counting #joyHint{display:block}
   <button id="dashBtn">DASH</button>
 </div>
 <button id="mute" aria-label="sound">🔊</button>
+<button id="quit" aria-label="leave game">✕</button>
 
 <div id="menu" class="screen on">
   <div class="card">
@@ -743,6 +747,8 @@ addEventListener('keydown',e=>{
   if(e.key===' ')inp.dash=true;
   const k=e.key.toLowerCase();if(k==='e'||k==='shift'||k==='q'||k==='enter')inp.use=true;
 });
+let quitArm=0;
+$('quit').onclick=()=>{const n=performance.now();if(quitArm&&n-quitArm<2500){quitArm=0;$('quit').classList.remove('arm');leave();return}quitArm=n;$('quit').classList.add('arm');toast('Tap ✕ again to leave the game');setTimeout(()=>{if(performance.now()-quitArm>=2500)$('quit').classList.remove('arm')},2600)};
 addEventListener('keyup',e=>{keys[e.key.toLowerCase()]=false});
 addEventListener('blur',()=>{for(const k in keys)keys[k]=false});
 const joy={id:null,ox:0,oy:0,x:0,y:0,base:$('joyBase'),knob:$('joyBase').firstElementChild};
@@ -1262,7 +1268,7 @@ function fitCam(){
     if(ok){baseDist=d;return}}
   baseDist=60;
 }
-function resize(){const w=innerWidth,h=innerHeight;renderer.setPixelRatio(Math.min(devicePixelRatio||1,w<1000?1.5:2));renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();fitCam();
+function resize(){const w=innerWidth,h=innerHeight;renderer.setPixelRatio(Math.min(devicePixelRatio||1,w>1200?1.25:1.5));renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();fitCam();
   const v=new THREE.Vector2();renderer.getDrawingBufferSize(v);pMat.uniforms.uH.value=v.y}
 addEventListener('resize',resize);addEventListener('orientationchange',()=>setTimeout(resize,250));resize();
 
