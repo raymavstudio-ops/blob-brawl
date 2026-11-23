@@ -94,6 +94,7 @@ h1,h2,h3{font-family:'Lilita One',Impact,sans-serif;font-weight:400;margin:0}
 .lrow{display:flex;align-items:center;gap:6px;min-height:54px;border-radius:14px;padding:3px 6px;background:#f2f4ff;margin-top:5px;border:3px solid transparent}
 .lrow.me{background:#fff2b8;border-color:var(--ink)}.lrow.empty{background:rgba(255,255,255,.4);border:3px dashed #aab;color:var(--dim);font-size:14px;justify-content:center}
 .lb{width:42px;height:46px;flex:none}.lb svg{width:100%;height:100%;overflow:visible}
+@media (max-height:420px){.sh{min-height:40px}#s-lobby h2,#s-col h2,#s-duelb h2{font-size:24px}.lrow{min-height:42px;margin-top:4px}.lrow.empty{min-height:34px;font-size:12px}.lob{margin:2px auto;gap:8px}.lcol,.rcol{padding:8px}}
 .ln{flex:1;min-width:0;font:400 17px 'Lilita One';white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lc{display:flex;gap:4px}.lcls{font-size:14px;white-space:nowrap}
 .cbtn{width:48px;height:48px;font-size:22px;border-radius:14px;background:#fff;border:3px solid var(--ink);box-shadow:0 3px 0 var(--ink);padding:0}
@@ -1261,7 +1262,7 @@ function fxEvents(evs){if(!evs.length)return;const me=S.me;
   case'lose':banner('DEFEATED','#ff7b7b');SFX.lose();break}}}
 function confetti(){for(let i=0;i<46;i++){FXL.push({k:'c',x:Math.random()*innerWidth,y:-10-Math.random()*80,vx:(Math.random()-.5)*90,vy:120+Math.random()*160,life:0,max:2.6,col:['#ffd23f','#ff6fb5','#4cc9ff','#7ee36a','#ffa23f'][i%5],r:4+Math.random()*4,rot:Math.random()*6})}}
 let fctx=null,fdpr=1;
-function sizeFx(){const c=$('fx');fdpr=Math.min(2,window.devicePixelRatio||1);c.width=innerWidth*fdpr;c.height=innerHeight*fdpr;fctx=c.getContext('2d')}
+function sizeFx(){const c=$('fx');fdpr=Math.min(innerWidth>1200?1.25:1.5,window.devicePixelRatio||1);c.width=innerWidth*fdpr;c.height=innerHeight*fdpr;fctx=c.getContext('2d')}
 function updateFX(dt){
  if(UI.shake>0){UI.shake*=Math.exp(-dt*10);if(UI.shake<.12)UI.shake=0}
  const st=$('stage');if(st){if(UI.shake>0)st.style.transform=`translate(${((Math.random()*2-1)*UI.shake).toFixed(2)}px,${((Math.random()*2-1)*UI.shake).toFixed(2)}px)`;else if(st.style.transform)st.style.transform=''}
@@ -1308,7 +1309,7 @@ function slotsModal(){const rows=[0,1,2].map(i=>{const s=i===slotIdx?P:loadSlot(
  m.querySelectorAll('[data-dl]').forEach(b=>b.onclick=()=>{if(confirm('Delete this save slot forever?')){try{localStorage.removeItem(SK+'slot'+b.dataset.dl)}catch(e){}slotsModal()}});
  m.querySelectorAll('[data-ex]').forEach(b=>b.onclick=async()=>{const i=+b.dataset.ex;const s=i===slotIdx?P:loadSlot(i);if(!s){toast('Empty slot');return}const code=await encodeSave(s);$('sx').innerHTML=`<p class="mt">Copy this save code. It holds your cards, cosmetics, stats and current run:</p><textarea id="cc" readonly rows="3">${code}</textarea><button class="btn blue" id="cp">Copy code</button>`;$('cp').onclick=()=>{const t=$('cc');t.select();try{navigator.clipboard.writeText(code).then(()=>toast('Copied!'),()=>{document.execCommand('copy');toast('Copied!')})}catch(e){document.execCommand('copy');toast('Copied!')}}});
  m.querySelectorAll('[data-im]').forEach(b=>b.onclick=()=>{const i=+b.dataset.im;$('sx').innerHTML=`<p class="mt">Paste a save code to replace slot ${i+1}:</p><textarea id="cc" rows="3" placeholder="CC1:..."></textarea><button class="btn pink" id="ig">Import into slot ${i+1}</button>`;
-  $('ig').onclick=async()=>{try{const o=migrate(await decodeSave($('cc').value));if(!o||!o.st)throw 0;if(!confirm('Replace slot '+(i+1)+' with the imported save?'))return;lsSet(SK+'slot'+i,JSON.stringify(o));if(i===slotIdx){P=o}toast('Save imported!');slotsModal();renderTitle()}catch(e){toast('That code did not work')}}})}
+  $('ig').onclick=async()=>{try{const o=migrate(await decodeSave($('cc').value));if(!o||!o.st)throw 0;if(loadSlot(i)&&!confirm('Replace slot '+(i+1)+' with the imported save?'))return;lsSet(SK+'slot'+i,JSON.stringify(o));if(i===slotIdx){P=o}toast('Save imported!');slotsModal();renderTitle()}catch(e){toast('That code did not work')}}})}
 function goalsModal(){const gl=goalsList(),d=dailySeed();const mod=MODS[MODK[d%MODK.length]];
  openModal(`<h3>🎯 Goals</h3>${['Today','This week','Long-term'].map(t=>`<div class="gh">${t}</div>`+gl.filter(g=>g.t===t).map(g=>`<div class="goal"><span>${g.txt}</span><div class="gb"><i style="width:${g.cur/g.max*100}%"></i></div><b>${g.cur}/${g.max}</b></div>`).join('')).join('')}
  <div class="gh">Daily twist</div><div class="goal"><span><b>${mod[0]}</b> - ${mod[1]}</span></div><button class="btn blue" id="hlp">How to play</button><button class="btn ghost" onclick="closeModal()">Close</button>`,'wide');$('hlp').onclick=helpModal}

@@ -194,6 +194,8 @@ body.indun:not(.touch) #hint{display:none}
 .statl{display:grid;grid-template-columns:1fr 1fr;gap:1px 10px;font-size:13px}
 .statl span{display:flex;justify-content:space-between}
 .statl b{font-weight:700}
+@media (max-height:500px){.statl{font-size:11.5px;gap:0;grid-template-columns:1fr 1fr}.statl span{white-space:nowrap;gap:2px;min-width:0}.statl span b{font-size:11.5px}}
+@media (max-height:500px) and (max-width:760px){.statl{grid-template-columns:1fr}}
 .skills{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.tcol{display:flex;flex-direction:column;gap:5px;min-width:0}.tcol .tierl{margin:0}@media (max-width:640px){.skills{grid-template-columns:1fr 1fr}}
 .sk{min-height:56px;border:3px solid var(--ink);border-radius:14px;background:#fff;text-align:left;padding:4px 8px;cursor:pointer;font:600 12.5px 'Fredoka',sans-serif;color:var(--ink);line-height:1.15;display:flex;gap:6px;align-items:center}
 .sk .e{font-size:22px;flex:none}.sk>span:last-child{min-width:0}
@@ -229,8 +231,10 @@ body.indun:not(.touch) #hint{display:none}
 #rotate .ph{font-size:76px;animation:rot 1.6s ease-in-out infinite;-webkit-text-stroke:0}
 @keyframes rot{0%,30%{transform:rotate(0)}70%,100%{transform:rotate(-90deg)}}
 @media (orientation:portrait){body.touch.indun #rotate,body.touch.inhub #rotate{display:flex}}
+@media (orientation:portrait) and (max-width:600px){body.indun #rotate,body.inhub #rotate{display:flex}}
 #toast{position:fixed;left:50%;top:14px;transform:translateX(-50%) translateY(-140px);background:#fff;border:3px solid var(--ink);box-shadow:0 4px 0 var(--ink);padding:8px 18px;border-radius:16px;z-index:30;transition:transform .25s cubic-bezier(.3,1.6,.5,1);max-width:80vw;text-align:center;font-size:15px}
 #toast.on{transform:translateX(-50%) translateY(0)}
+@media (max-height:480px){#toast{top:64px;font-size:14px;padding:6px 14px}}
 #loadErr{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#fff;border:3px solid var(--ink);border-radius:14px;padding:8px 14px;z-index:40;display:none;font-size:14px}
 #fade{position:fixed;inset:0;background:#1d1b3a;opacity:0;pointer-events:none;z-index:9;transition:opacity .35s}
 #fade.on{opacity:1}
@@ -259,6 +263,7 @@ body.indun:not(.touch) #hint{display:none}
 }
 
 #mini{border:4px solid var(--ink);border-radius:20px;background:rgba(29,27,58,.62);box-shadow:0 4px 0 var(--ink)}
+@media (max-height:420px){#mini{width:84px;height:84px;top:calc(max(6px,env(safe-area-inset-top)) + 54px)}}
 #pv{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;border-radius:14px}
 .win{background:radial-gradient(circle at 50% 40%,#7a74a8,#3f3a66);border:4px solid var(--ink);overflow:hidden;min-width:0}
 .eqs{position:relative;z-index:1}
@@ -443,13 +448,13 @@ setInterval(musicTick,100);
 
 /* ======================= renderer ======================= */
 const renderer=new THREE.WebGLRenderer({canvas:$('gl'),antialias:true,powerPreference:'high-performance'});
-const PR=()=>Math.min(devicePixelRatio||1,innerWidth<1000?1.5:2);
+const PR=()=>Math.min(devicePixelRatio||1,innerWidth>1200?1.25:1.5);
 renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 const scene=new THREE.Scene();
 const camera=new THREE.PerspectiveCamera(42,1,.5,260);
 const hc=$('hudc'),hx=hc.getContext('2d');let hdpr=1;
 function resize(){renderer.setPixelRatio(PR());renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();
-  hdpr=Math.min(devicePixelRatio||1,2);hc.width=innerWidth*hdpr;hc.height=innerHeight*hdpr}
+  hdpr=Math.min(devicePixelRatio||1,innerWidth>1200?1.25:1.5);hc.width=innerWidth*hdpr;hc.height=innerHeight*hdpr}
 addEventListener('resize',resize);resize();
 function canvasTex(w,h,fn,rep){const c=document.createElement('canvas');c.width=w;c.height=h;fn(c.getContext('2d'),w,h);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());if(rep){t.wrapS=t.wrapT=THREE.RepeatWrapping}return t}
 const hemi=new THREE.HemisphereLight(0xffffff,0x6fa85a,1.5);scene.add(hemi);
@@ -2198,7 +2203,7 @@ function pvInit(){
   pvBlob=makeBlob(S.ch.ci);pvScene.add(pvBlob.root)}
 function pvRender(dt){
   if(!pvR||!pvCanvas.isConnected){return}const w=pvCanvas.clientWidth,h=pvCanvas.clientHeight;if(!w||!h)return;
-  const pr=Math.min(devicePixelRatio||1,2);if(pvCanvas.width!==Math.round(w*pr)||pvCanvas.height!==Math.round(h*pr)){pvR.setPixelRatio(pr);pvR.setSize(w,h,false);pvCam.aspect=w/h;pvCam.updateProjectionMatrix()}
+  const pr=Math.min(devicePixelRatio||1,1.5);if(pvCanvas.width!==Math.round(w*pr)||pvCanvas.height!==Math.round(h*pr)){pvR.setPixelRatio(pr);pvR.setSize(w,h,false);pvCam.aspect=w/h;pvCam.updateProjectionMatrix()}
   if(pvBlob.ci!==S.ch.ci){pvScene.remove(pvBlob.root);pvBlob=makeBlob(S.ch.ci);pvScene.add(pvBlob.root)}
   dressBlob(pvBlob,lookOf(S.ch));pvBlob.root.rotation.y=.45+Math.sin(S.clock*.7)*.55;
   animBlob(pvBlob,{mv:0},dt);pvR.render(pvScene,pvCam)}
@@ -2280,7 +2285,7 @@ function renderPanel(){
   }else if(t==='menu'){
     title='☰ Menu';card.classList.add('narrow');
     h=`<button class="btn green" data-a="close">Resume</button><button class="btn ghost" data-a="music">🎵 Music: ${musicOn?'ON':'OFF'}</button><button class="btn ghost" data-a="savenow">💾 Save now</button><button class="btn ghost" data-a="exportme">📤 Export save code</button>`+
-      (S.mode==='dungeon'?`<button class="btn red" data-a="abandon">${S.role==='client'?'Leave the run':'Abandon run'} (keeps XP, loses some gold)</button>`:`<button class="btn ghost" data-a="quit">◀ Save & quit to title</button>`)+`<a class="btn ghost" href="../" data-a="arcade">◀ Arcade</a>`;
+      (S.mode==='dungeon'?`<button class="btn red" data-a="abandon">${S.role==='client'?'Leave the run':'Abandon run'} (keeps XP, loses some gold)</button><button class="btn ghost" data-a="abandonquit">◀ Abandon &amp; quit to title</button>`:`<button class="btn ghost" data-a="quit">◀ Save & quit to title</button>`)+`<a class="btn ghost" href="../" data-a="arcade">◀ Arcade</a>`;
   }else if(t==='recap'){
     title='Welcome back!';card.classList.add('narrow');const r=ch.lastRun,today=dayNum(),claim=ch.day!==today,streak=ch.day===today-1?ch.streak+1:1;
     h=`<div class="h4">${esc(ch.name)} · Lv ${ch.lvl} ${CLS[ch.cls].n}</div>`+(r?`<div class="res"><span>Last adventure</span><b>${r.kind==='defeat'?'Defeated':r.kind==='extract'?'Extracted':'Ended'} · F${r.floor}</b><span>Monsters</span><b>${r.kills}</b><span>Gold banked</span><b>💰${r.gold}</b><span>XP earned</span><b>${r.xp}</b></div>`:'<div class="note">Your adventure begins. Step into the portal when you are ready!</div>')+
@@ -2346,6 +2351,7 @@ $('pBody').addEventListener('click',async e=>{
   case'savenow':saveGame();toast('💾 Saved');break;
   case'exportme':openPanel('export');break;
   case'quit':saveGame();closePanel();leaveParty(true);quitToTitle();break;
+  case'abandonquit':{closePanel();if(S.role==='client'){leaveParty(true);finishRun('defeat',{})}else endRunHost('defeat');closePanel(true);leaveParty(true);quitToTitle();break}
   case'abandon':{closePanel();if(S.role==='client'){leaveParty(true);finishRun('defeat',{})}else endRunHost('defeat');break}
   case'tohub':toHub();break;
   case'daily':{const today=dayNum();ch.streak=ch.day===today-1?ch.streak+1:1;ch.day=today;const g=40+ch.streak*30;ch.gold+=g;SFX.legend();toast('🎁 +💰'+g+' daily reward!');rerender();break}

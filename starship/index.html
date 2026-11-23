@@ -141,6 +141,7 @@ body.onmenu .arc{display:block}
 #rotate .ph{font-size:76px;animation:rot 1.6s ease-in-out infinite;-webkit-text-stroke:0}
 @keyframes rot{0%,30%{transform:rotate(0)}70%,100%{transform:rotate(-90deg)}}
 @media (orientation:portrait){body.touch.inroom #rotate,body.playing.touch #rotate{display:flex}}
+@media (orientation:portrait) and (max-width:600px){body.inroom #rotate,body.playing #rotate{display:flex}}
 #toast{position:fixed;left:50%;top:14px;transform:translateX(-50%) translateY(-120px);background:#fff;border:3px solid var(--ink);box-shadow:0 4px 0 var(--ink);padding:9px 18px;border-radius:16px;z-index:30;transition:transform .25s cubic-bezier(.3,1.6,.5,1);max-width:70vw;text-align:center}
 #toast.on{transform:translateX(-50%) translateY(0)}
 #loadErr{display:none;position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:40;background:#fff;border:3px solid var(--ink);border-radius:14px;padding:8px 14px;font-size:14px}
@@ -153,6 +154,7 @@ body.onmenu .arc{display:block}
 }
 @media (max-height:540px){#shop .shopgrid{max-height:calc(100vh - 200px);overflow:auto;padding:12px 4px 4px}#shop .big{display:none}.card{padding:12px 16px}h1{font-size:40px}h2{font-size:26px}.sub{margin:6px 0}.code{font-size:36px}.res{gap:5px;margin:8px 0}.rk{padding:4px 12px;font-size:15px}.slot{min-height:80px}.recap{margin-top:6px;padding:4px 10px;font-size:13px;min-height:0}.shopgrid{gap:7px}}
 @media (max-height:420px){h1{font-size:34px!important;line-height:.95;transform:none}.card .sub{margin:4px 0 2px;font-size:13px}label,.lbl{margin:5px 0 3px}.btn{padding:6px 8px;margin-top:7px;font-size:18px}input[type=text]{padding:6px 12px}.card{padding:10px 14px}.join{margin-top:8px}.join input{padding:5px}.code{font-size:30px;letter-spacing:7px}.plist{margin:5px 0 2px;gap:5px}.pl{padding:3px 9px}.switch{padding:4px 12px;margin-top:5px}.upg .e{font-size:22px}.upg .d{display:none}.choice{padding:6px 12px;margin-top:6px}.evtxt{font-size:14px;margin:2px 0}.big{margin:4px 0 0}.stat b{font-size:20px}.acts .btn{padding:4px 2px;font-size:15px}.nd{width:48px;height:48px;margin:-24px 0 0 -24px;font-size:22px}.mhead h2{font-size:22px}.slot .d{display:none}.slot{min-height:64px}}
+@media (max-height:480px) and (min-width:520px){#menu,#slots{padding-left:116px}}
 </style>
 </head>
 <body>
@@ -1145,13 +1147,15 @@ function renderMap(){
   $('mHull').textContent='🧱 '+Math.round(run.hp)+'/'+maxHull(run);$('mScrap').textContent='🔩 '+run.scrap;$('mCred').textContent='🪙 '+run.credits;
   const box=$('mapBox');box.querySelectorAll('.nd,.ndl').forEach(n=>n.remove());
   const svg=$('mapSvg');let lines='';const cur=run.nodes[run.cur];
-  for(const n of run.nodes)for(const t of n.nx){const m=run.nodes[t],hot=n.id===run.cur;lines+=`<line x1="${n.x*1000}" y1="${n.y*400}" x2="${m.x*1000}" y2="${m.y*400}" stroke="${hot?'#ffd23f':'rgba(255,255,255,.35)'}" stroke-width="${hot?5:3}" stroke-dasharray="${hot?'':'2 10'}" stroke-linecap="round" vector-effect="non-scaling-stroke"/>`}
+  const cnt={};for(const n of run.nodes)cnt[n.l]=(cnt[n.l]||0)+1;
+  const dy=n=>{const c=cnt[n.l];return c===1?.5:.5+(n.i-(c-1)/2)*(c===2?.42:.34)}; /* evenly spread rows so nodes + labels never overlap on short screens */
+  for(const n of run.nodes)for(const t of n.nx){const m=run.nodes[t],hot=n.id===run.cur;lines+=`<line x1="${n.x*1000}" y1="${dy(n)*400}" x2="${m.x*1000}" y2="${dy(m)*400}" stroke="${hot?'#ffd23f':'rgba(255,255,255,.35)'}" stroke-width="${hot?5:3}" stroke-dasharray="${hot?'':'2 10'}" stroke-linecap="round" vector-effect="non-scaling-stroke"/>`}
   svg.innerHTML=lines;
   for(const n of run.nodes){const b=document.createElement('button');const reach=cur.nx.includes(n.id),done=run.vis.includes(n.id)&&n.id!==run.cur;
     b.className='nd'+(reach?' go':'')+(n.id===run.cur?' cur':'')+(done?' done':'')+(!reach&&!done&&n.id!==run.cur?' off':'');
-    b.style.left=n.x*100+'%';b.style.top=n.y*100+'%';b.textContent=NT[n.t].e;b.setAttribute('aria-label',NT[n.t].n);
+    b.style.left=n.x*100+'%';b.style.top=dy(n)*100+'%';b.textContent=NT[n.t].e;b.setAttribute('aria-label',NT[n.t].n);
     b.onclick=()=>{if(reach)reqNode(n.id);else toast(done||n.id===run.cur?'Already visited':'Too far — pick a glowing stop')};box.appendChild(b);
-    const l=document.createElement('div');l.className='ndl';l.style.left=n.x*100+'%';l.style.top=`calc(${n.y*100}% + 29px)`;l.textContent=NT[n.t].n;box.appendChild(l)}
+    const l=document.createElement('div');l.className='ndl';l.style.left=n.x*100+'%';l.style.top=`calc(${dy(n)*100}% + 29px)`;l.textContent=NT[n.t].n;box.appendChild(l)}
   $('mapFoot').textContent=cur.nx.length?'Pick your next stop — any crew member can tap!':'';}
 function reqNode(id){SFX.ui();if(S.role==='client')send(hostConn,{t:'node',id});else startNode(id)}
 /* event */
@@ -1209,7 +1213,7 @@ let wl=null;async function wake(){try{if(navigator.wakeLock&&!wl){wl=await navig
 /* ================= renderer setup ================= */
 const INK=0x1d1b3a;
 const renderer=new THREE.WebGLRenderer({canvas:gl,antialias:true,powerPreference:'high-performance'});
-const DPR=()=>Math.min(devicePixelRatio||1,innerWidth<1000?1.5:2);
+const DPR=()=>Math.min(devicePixelRatio||1,innerWidth>1200?1.25:1.5);
 renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 const scene=new THREE.Scene();
 const camera=new THREE.PerspectiveCamera(36,1,.1,400);
