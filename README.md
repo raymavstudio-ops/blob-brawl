@@ -7,7 +7,7 @@ A pocket arcade of cartoon games for 1–4 friends. Works on iPhone, Android and
 Tip: open the link on your phone and tap **Add to Home Screen** for a full-screen app icon.
 
 ## Games
-Quick games: Blob Brawl, Blob Kart, Blob Sumo, Prop Hunt, Blob Squad, Blob Golf, Blob Party, Hot Bomb, Tank Bounce, Doodle Guess, Blob Kitchen, Blob Royale, Blob Heist, Among Blobs, Blob Smash.
+Quick games: Blob Brawl, Blob Kart, Blob Sumo, Prop Hunt, Blob Squad, Blob Golf, Blob Party, Hot Bomb, Tank Bounce, Doodle Guess, Blob Kitchen, Blob Royale, Blob Heist, Among Blobs, Blob Smash, Blob Wobble.
 
 Long games that save your progress: Critter Quest, Blob Kingdom, Dungeon Delvers, Card Clash, Starship Crew, Blob Farm, Blob Tycoon, Blob Fishing, Blob Tactics, Monster Ranch, Pirate Seas, Blob Survival.
 
