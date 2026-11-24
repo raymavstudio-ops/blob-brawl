@@ -18,3 +18,6 @@ Long games that save your progress: Critter Quest, Blob Kingdom, Dungeon Delvers
 
 ## How it works
 Each game is one `index.html` in its own folder, with no build step. Three.js draws the 3D, and PeerJS (WebRTC) connects the phones directly, with the host's device running the game.
+
+## For AI agents and contributors
+See [AGENTS.md](AGENTS.md), [docs/ROADMAP.md](docs/ROADMAP.md) and [docs/GAMES.md](docs/GAMES.md).
