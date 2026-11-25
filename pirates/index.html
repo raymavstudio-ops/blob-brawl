@@ -120,6 +120,7 @@ body.modal-open #hud,body.modal-open #pins{visibility:hidden}
 .kbd{font-size:13px;color:var(--dim);line-height:1.5}
 @media (max-height:500px){.card{padding:10px 14px 10px}h1{font-size:34px;transform:none}.sub{margin:4px 0 6px;font-size:13px}.btn{padding:3px 8px;margin-top:6px;font-size:17px}label{margin:4px 0 2px}.code{font-size:34px}#mbody{max-height:calc(100vh - 170px)}.slot{margin-top:5px;padding:3px 8px}h2{font-size:24px;margin:0}.card h2+#slotList{margin-top:0}
  #mini{width:84px;height:84px}.ib{width:48px;height:48px}#bAct{width:84px;height:84px;font-size:16px}#bLeave{right:max(112px,calc(env(safe-area-inset-right) + 112px))}#uiHelm{width:112px;height:112px;right:max(168px,calc(env(safe-area-inset-right) + 168px))}#dial svg{width:100px;height:100px}#uiSail{height:112px;bottom:calc(max(16px,env(safe-area-inset-bottom)) + 94px)}.chip{font-size:13px}}
+@media (min-width:1201px){.chip{font-size:19px;padding:2px 13px;border-radius:14px}#chips{gap:6px}#obj{font-size:21px;max-width:36vw}.pill{font-size:22px;min-height:56px;padding:5px 20px}#stnName{font-size:23px}.ib{width:58px;height:58px;font-size:25px}#pills{top:calc(max(8px,env(safe-area-inset-top)) + 72px)}}
 </style>
 </head>
 <body>
@@ -372,6 +373,15 @@ function genWorld(seed){
   }
   if(!isl.some(i=>i.biome==='volcano')){const c=isl.find(i=>!i.port&&i.z<230);if(c){c.biome='volcano';c.hmax=14}}
   if(!isl.some(i=>i.biome==='ruins')){const c=isl.find(i=>!i.port&&i.biome!=='volcano');if(c){c.biome='ruins';c.hmax=3.6}}
+  // names must fit the biome (ice -> frosty names, volcano -> fiery names, no fire/frost names elsewhere)
+  {const ICEI=['Frostbite Isle','Glacier Rock','Snowcap Key','Icicle Atoll','Penguin Point','Floe Rest','Blizzard Bay','Frozen Hollow'],VOLI=['Ember Isle','Ash Hollow','Cinder Key','Smokestack Isle'],ICEP=['Frostport','Floe Harbor','Snowcap Landing','Icicle Quay'],SPARE=['Sunset Key','Lagoon Rest','Pearl Shoal','Seagrass Isle','Pelican Rock'];
+   let ii=0,vi=0,ip=0,sp=0;const used=new Set(isl.map(i=>i.name));
+   for(const I of isl){
+     if(I.port){if(I.biome==='ice'){if(!ICEP.includes(I.name)){I.name=ICEP[ip%ICEP.length]+(ip>=ICEP.length?' II':'');}ip++}else if(ICEP.includes(I.name))I.name='Sunrise Harbor'}
+     else if(I.biome==='ice'){I.name=ICEI[ii%ICEI.length]+(ii>=ICEI.length?' II':'');ii++}
+     else if(I.biome==='volcano'){I.name=VOLI[vi%VOLI.length]+(vi>=VOLI.length?' II':'');vi++}
+     else if(VOLI.includes(I.name)||ICEI.includes(I.name)){let n;do{n=SPARE[sp%SPARE.length]+(sp>=SPARE.length?' II':'');sp++}while(used.has(n));I.name=n}
+   }}
   // port data
   for(const P of ports){P.mult={};const gs=GOODS.map(g=>g.id).sort(()=>R()-.5);P.mult[gs[0]]=.55;P.mult[gs[1]]=.6;P.mult[gs[4]]=1.5;P.mult[gs[5]]=1.4;P.mult[gs[2]]=.95+R()*.15;P.mult[gs[3]]=.95+R()*.15;
     P.per={};P.ph={};for(const g of GOODS){P.per[g.id]=500+R()*700;P.ph[g.id]=R()*TAU}

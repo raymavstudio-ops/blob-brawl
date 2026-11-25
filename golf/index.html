@@ -762,8 +762,9 @@ function buildCard(){
 function rankList(){return[...S.players].sort((a,b)=>totals(a).t-totals(b).t||(S.sc[b.id]||[]).filter(s=>s===1).length-(S.sc[a.id]||[]).filter(s=>s===1).length)}
 function buildResults(){
   const rk=rankList(),w=rk[0],meds=['🥇','🥈','🥉','🎖️'];if(!w)return;const T=totals(w);
-  $('resTitle').textContent=w.id===S.me?'YOU WIN!':esc(w.name).toUpperCase()+' WINS!';
-  $('resSub').textContent=T.t+' strokes ('+fmtD(T.d)+')'+(S.role==='client'?' · waiting for host':'');
+  const tied=rk.filter(p=>totals(p).t===T.t),isTie=tied.length>1;
+  $('resTitle').textContent=isTie?"IT'S A TIE!":(w.id===S.me?'YOU WIN!':esc(w.name).toUpperCase()+' WINS!');
+  $('resSub').textContent=(isTie?(tied.length>2?tied.length+'-way tie':tied.map(p=>p.name).join(' & '))+' · ':'')+T.t+' strokes ('+fmtD(T.d)+')'+(S.role==='client'?' · waiting for host':'');
   $('resList').innerHTML=rk.map((p,i)=>{const t=totals(p);return`<div class="rk"><span class="m">${meds[i]}</span><i style="color:${COLORS[p.ci]}"></i><span class="nm">${esc(p.name)}</span><span class="n">${t.t}<small>${fmtD(t.d)}</small></span></div>`}).join('');
   $('resTable').innerHTML=scoreTable(-1);
   $('btnAgain').style.display=S.role==='client'?'none':'block';

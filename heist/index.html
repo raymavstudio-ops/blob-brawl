@@ -1488,7 +1488,7 @@ const R={ok:true,scene,camera,renderer,pm,puff,shock,floatText,sparkle,
       camL.x+=(lx-camL.x)*Math.min(1,dt*3);camL.z+=(lz-camL.z)*Math.min(1,dt*3);
       const px=cp.x+camL.x,pz=cp.z+camL.z;
       if(!camInit){camT.set(px,0,pz);camInit=true}else camT.lerp(tmpV.set(px,0,pz),Math.min(1,dt*7));
-      const zz=zoom*(window.__zoom||1)*(innerHeight<520?.9:1);camera.position.set(camT.x,24*zz,camT.z+11.8*zz);
+      const zz=zoom*(window.__zoom||1)*(innerHeight<520?.76:1);camera.position.set(camT.x,24*zz,camT.z+11.8*zz);
     }else if(S.ph==='end'){camera.position.set(V.M.W*CS/2,70,V.M.H*CS/2+40);camT.set(V.M.W*CS/2,0,V.M.H*CS/2)}
     else{camInit=false;const a=t*.08+.5,cx=V.M.W*CS/2,cz=V.M.H*CS/2;camera.position.set(cx+Math.sin(a)*46,34,cz+Math.cos(a)*46+10);camT.set(cx,0,cz)}
     const sh=Math.min(shake,10)*.013;if(sh>0){camera.position.x+=Math.sin(t*61)*sh;camera.position.z+=Math.cos(t*53)*sh;camera.position.y+=Math.sin(t*47)*sh*.6}

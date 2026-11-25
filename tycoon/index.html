@@ -491,9 +491,15 @@ RB.flume=(m,bd)=>{const T=m.T;pad(m,8,6);const WAT=T.water||0x59c8ff;
  for(const z of[-.86,.86])m.cylc('log',.33,.05,0,.36,z,0xf0cf94,Math.PI/2,0,0,14);
  for(const z of[-.45,.45])m.tor('log',.4,.04,0,.36,z,0x5a3a1c,0,0,0,16);
  m.rbox('log',.66,.1,1.1,0,.66,0,0x6a4020,0,.04);m.rbox('log',.6,.16,.3,0,.7,-.1,0xd49a5a,0,.05);m.rbox('log',.5,.22,.3,0,.45,.82,0xd49a5a,0,.1);m.seat('log',0,.7,-.1)};
-RA.flume=(G,s,m)=>{const P=m.path,L=[];let tot=0;for(let i=0;i<P.length-1;i++){const d=Math.hypot(P[i+1][0]-P[i][0],P[i+1][1]-P[i][1],P[i+1][2]-P[i][2]);L.push(d);tot+=d}
- let d=((s.a*.8)%1)*tot,i=0;while(i<L.length-1&&d>L[i]){d-=L[i];i++}const a=P[i],b=P[i+1],t=d/L[i],hl=Math.hypot(b[0]-a[0],b[1]-a[1]);
- G.log.position.set(lerp(a[0],b[0],t),lerp(a[2],b[2],t)+.17,lerp(a[1],b[1],t));G.log.rotation.set(-Math.atan2(b[2]-a[2],hl),Math.atan2(b[0]-a[0],b[1]-a[1]),0,'YXZ');G.log.visible=s.sp>.05||true};
+RA.flume=(G,s,m)=>{const P=m.path,L=[],N=P.length-1;let tot=0;for(let i=0;i<N;i++){const d=Math.hypot(P[i+1][0]-P[i][0],P[i+1][1]-P[i][1],P[i+1][2]-P[i][2]);L.push(d);tot+=d}
+ let d=((s.a*.8)%1)*tot,i=0;while(i<L.length-1&&d>L[i]){d-=L[i];i++}const a=P[i],b=P[i+1],t=d/L[i];
+ /* heading/pitch of a segment; blended with the neighbours near the corners so the log turns smoothly */
+ const sg=k=>{const A=P[(k+N)%N],B=P[(k+N)%N+1],hl=Math.hypot(B[0]-A[0],B[1]-A[1]);return[Math.atan2(B[0]-A[0],B[1]-A[1]),-Math.atan2(B[2]-A[2],hl)]};
+ const la=(x,y,u)=>{const e=Math.atan2(Math.sin(y-x),Math.cos(y-x));return x+e*u};
+ const cur=sg(i),Bz=Math.min(1.3,L[i]*.45);let yaw=cur[0],pit=cur[1];
+ if(d<Bz){const pv=sg(i-1),u=.5+.5*d/Bz;yaw=la(pv[0],cur[0],u);pit=la(pv[1],cur[1],u)}
+ else if(L[i]-d<Bz){const nx=sg(i+1),u=.5-.5*(L[i]-d)/Bz;yaw=la(cur[0],nx[0],u);pit=la(cur[1],nx[1],u)}
+ G.log.position.set(lerp(a[0],b[0],t),lerp(a[2],b[2],t)+.17,lerp(a[1],b[1],t));G.log.rotation.set(pit,yaw,0,'YXZ');G.log.visible=s.sp>.05||true};
 RB.pirate=(m,bd)=>{const T=m.T,py=5;pad(m,8,6);const cz=-.3;
  for(const z of[-1.2,1.2]){for(const sx of[-1,1])m.boxc('base',.24,Math.hypot(2.4,py),.24,sx*1.2,py/2,cz+z,T.d,0,0,sx*Math.atan2(2.4,py));m.sph('base',.2,0,py,cz+z,T.c)}
  m.cylc('base',.1,2.4,0,py,cz,0x888899,Math.PI/2);m.grp('ship',0,py,cz);m.cylc('ship',.1,2.9,0,py,cz,0x888899,Math.PI/2);

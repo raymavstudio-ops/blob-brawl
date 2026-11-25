@@ -133,6 +133,7 @@ body.blind #blind{display:flex}
 @media (max-height:500px) and (orientation:landscape){#lobby .card{width:min(820px,100%);display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:center}#lobby .plist{margin-top:0}
   #menu .card{width:min(720px,100%);display:grid;grid-template-columns:1fr 1fr;gap:4px 18px;align-items:center}#menu .lcol{align-self:center}}
 @media (max-height:390px) and (orientation:landscape){#results .card{width:min(560px,100%)}.res{grid-template-columns:1fr 1fr}.rk:first-child{transform:none}}
+@media (max-height:500px) and (orientation:landscape){#lobby .card{grid-template-columns:1fr 1.6fr}#lobby .pl{padding:5px 7px;gap:5px;font-size:14px}#lobby .pl i{width:14px;height:14px}#lobby .pl.me{background:#fff7c2}#lobby .pl.me small{display:none}}
 @media (max-height:500px) and (orientation:landscape){#menu{padding-right:max(64px,calc(env(safe-area-inset-right) + 58px))}}
 body.blind #hud{z-index:6}body.blind #hud *{visibility:hidden}body.blind #hud #quit{visibility:visible}
 @media (max-height:420px){h1{font-size:40px!important;line-height:.95}.card .sub{margin:4px 0 2px;font-size:13px}label{margin:4px 0 3px}.btn{padding:4px 8px;margin-top:7px;font-size:18px}input[type=text]{padding:4px 12px}.card{padding:10px 14px}h1{transform:none}.join{margin-top:8px}.join input{padding:5px}.code{font-size:30px}.opt{margin-top:5px}.mode{padding:3px}.mdesc{font-size:12px;margin-top:5px}.plist{margin:6px 0 2px;gap:5px}.pl{padding:4px 10px}.switch{padding:5px 12px;margin-top:5px}
@@ -1113,7 +1114,7 @@ function renderLobby(){
   chips($('optRounds'),[[3,'3'],[4,'4'],[5,'5']],S.nr,v=>S.nr=v);
   const list=$('plist');list.innerHTML='';
   for(let i=0;i<4;i++){const p=S.players.find(q=>q.ci===i),d=document.createElement('div');
-    if(p){d.className='pl';d.innerHTML=`<i style="color:${COLORS[p.ci]}"></i><span>${esc(p.name)}</span><small>${p.id===S.me?'you':p.bot?'bot':''}</small>`}
+    if(p){d.className='pl'+(p.id===S.me?' me':'');d.innerHTML=`<i style="color:${COLORS[p.ci]}"></i><span>${esc(p.name)}</span><small>${p.id===S.me?'you':p.bot?'bot':''}</small>`}
     else{d.className='pl empty';d.innerHTML='<i style="color:#555"></i><span>Waiting…</span>'}list.appendChild(d)}
   $('botSwitch').style.display=S.role==='host'?'flex':'none';$('botSwitch').classList.toggle('on',S.botFill);
   $('btnStart').style.display=host?'block':'none';$('btnStart').disabled=S.players.length<2;

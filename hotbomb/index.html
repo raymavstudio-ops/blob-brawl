@@ -1286,7 +1286,7 @@ function render(dt){
   // list of players to draw + positions
   let list,pos;
   if(ing){list=S.players;pos=p=>[p.x,0,p.z]}
-  else if(end){const rk=ranking();list=rk;pos=p=>{const i=rk.indexOf(p),s=SLOTS[Math.min(i,3)];return[s[0],s[1],PZ+(i===3?1.45:0)]}}
+  else if(end){const rk=ranking();list=rk;pos=p=>{const i=rk.indexOf(p),s=SLOTS[Math.min(i,3)];return[s[0],s[1],PZ+(i===3?2.8:0)]}}
   else if(ph==='lobby'){list=S.players;pos=p=>{const i=S.players.indexOf(p),n=S.players.length;return[(i-(n-1)/2)*1.7,0,1.2]}}
   else{list=DEMO;pos=p=>{const i=DEMO.indexOf(p),a=t*.35+i*Math.PI/2;return[Math.cos(a)*3.2,0,Math.sin(a)*2.2+.6]}}
   // demo bomb holder cycles

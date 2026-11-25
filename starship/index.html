@@ -153,7 +153,7 @@ body.onmenu .arc{display:block}
  .screen{padding-right:calc(max(10px,env(safe-area-inset-right)) + 60px)}
 }
 @media (max-height:540px){#shop .shopgrid{max-height:calc(100vh - 200px);overflow:auto;padding:12px 4px 4px}#shop .big{display:none}.card{padding:12px 16px}h1{font-size:40px}h2{font-size:26px}.sub{margin:6px 0}.code{font-size:36px}.res{gap:5px;margin:8px 0}.rk{padding:4px 12px;font-size:15px}.slot{min-height:80px}.recap{margin-top:6px;padding:4px 10px;font-size:13px;min-height:0}.shopgrid{gap:7px}}
-@media (max-height:420px){h1{font-size:34px!important;line-height:.95;transform:none}.card .sub{margin:4px 0 2px;font-size:13px}label,.lbl{margin:5px 0 3px}.btn{padding:6px 8px;margin-top:7px;font-size:18px}input[type=text]{padding:6px 12px}.card{padding:10px 14px}.join{margin-top:8px}.join input{padding:5px}.code{font-size:30px;letter-spacing:7px}.plist{margin:5px 0 2px;gap:5px}.pl{padding:3px 9px}.switch{padding:4px 12px;margin-top:5px}.upg .e{font-size:22px}.upg .d{display:none}.choice{padding:6px 12px;margin-top:6px}.evtxt{font-size:14px;margin:2px 0}.big{margin:4px 0 0}.stat b{font-size:20px}.acts .btn{padding:4px 2px;font-size:15px}.nd{width:48px;height:48px;margin:-24px 0 0 -24px;font-size:22px}.mhead h2{font-size:22px}.slot .d{display:none}.slot{min-height:64px}}
+@media (max-height:420px){#lobby .card{grid-template-columns:1fr 1.7fr}.pl{padding:5px 6px;gap:4px;font-size:13px}.pl i{width:14px;height:14px}.pl.me{background:#fff7c2}.pl.me small{display:none}.pl span{overflow:hidden;text-overflow:ellipsis}h1{font-size:34px!important;line-height:.95;transform:none}.card .sub{margin:4px 0 2px;font-size:13px}label,.lbl{margin:5px 0 3px}.btn{padding:6px 8px;margin-top:7px;font-size:18px}input[type=text]{padding:6px 12px}.card{padding:10px 14px}.join{margin-top:8px}.join input{padding:5px}.code{font-size:30px;letter-spacing:7px}.plist{margin:5px 0 2px;gap:5px}.pl{padding:3px 9px}.switch{padding:4px 12px;margin-top:5px}.upg .e{font-size:22px}.upg .d{display:none}.choice{padding:6px 12px;margin-top:6px}.evtxt{font-size:14px;margin:2px 0}.big{margin:4px 0 0}.stat b{font-size:20px}.acts .btn{padding:4px 2px;font-size:15px}.nd{width:48px;height:48px;margin:-24px 0 0 -24px;font-size:22px}.mhead h2{font-size:22px}.slot .d{display:none}.slot{min-height:64px}}
 @media (max-height:480px) and (min-width:520px){#menu,#slots{padding-left:116px}}
 </style>
 </head>
@@ -1072,7 +1072,7 @@ function renderLobby(){
   $('codeWrap').style.display=solo?'none':'block';$('lobCode').textContent=S.code;
   const list=$('plist');list.innerHTML='';
   for(let i=0;i<4;i++){const p=S.players.find(q=>q.ci===i),d=document.createElement('div');
-    if(p){d.className='pl';d.innerHTML=`<i style="color:${COLORS[p.ci]}"></i><span>${esc(p.name)}</span><small>${p.id===S.me?'you':p.bot?'bot':'Lv'+p.lvl}</small>`}
+    if(p){d.className='pl'+(p.id===S.me?' me':'');d.innerHTML=`<i style="color:${COLORS[p.ci]}"></i><span>${esc(p.name)}</span><small>${p.id===S.me?'you':p.bot?'bot':'Lv'+p.lvl}</small>`}
     else{d.className='pl empty';d.innerHTML='<i style="color:#555"></i><span>Waiting…</span>'}list.appendChild(d)}
   $('botSwitch').style.display=S.role==='host'?'flex':'none';$('botSwitch').classList.toggle('on',S.botFill);
   $('btnStart').style.display=isHost?'block':'none';

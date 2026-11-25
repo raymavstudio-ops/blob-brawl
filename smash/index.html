@@ -1062,7 +1062,7 @@ function skyTex(stops){return canvasTex(4,256,(g,w,h)=>{const gr=g.createLinearG
 /* ---------- stage visuals ---------- */
 const stageGroup=new THREE.Group();scene.add(stageGroup);
 let SV={plat:[],lava:null,sea:null,clouds:[],cball:[],embers:null,windStreaks:null,smoke:[],pads:[]};
-const MATS={green:toon(0x7fdc5a,{map:TX.grass}),dirt:toon(0xa8703a,{map:TX.rock}),rock:toon(0x9a8574,{map:TX.rock}),white:toon(0xffffff),
+const MATS={green:toon(0x7fdc5a,{map:TX.grass}),dirt:toon(0xa8703a,{map:TX.rock}),rock:toon(0x9a8574,{map:TX.rock}),white:toon(0xffffff),mint:toon(0x8ff0b4,{map:TX.grass}),
   cloud:toon(0xffffff),wood:toon(0xc98a4b,{map:TX.wood}),woodD:toon(0x8c5a2b,{map:TX.wood}),dark:toon(0x5a4a52,{map:TX.rock}),darkTop:toon(0x6b5760,{map:TX.crack})};
 function clearGroup(g){while(g.children.length){const c=g.children.pop();c.traverse(o=>{if(o.isMesh&&o.geometry&&!o.userData.keep)o.geometry.dispose()})}}
 function addTo(parent,mesh,x,y,z,shadow=true,outline=.04){mesh.position.set(x,y,z);mesh.castShadow=shadow;mesh.receiveShadow=true;if(outline)hull(mesh,outline);parent.add(mesh);return mesh}
@@ -1080,17 +1080,19 @@ function platVisual(pl,theme){
   const g=new THREE.Group(),w=pl.w,k=pl.kind;
   if(k==='isle'||k==='leaf'){
     const big=k==='isle',D=big?4.4:2.8,th=big?.6:.4;
-    addTo(g,new THREE.Mesh(BX(w,th,D,.2),MATS.green),0,-th/2,0);
+    addTo(g,new THREE.Mesh(BX(w,th,D,.2),theme==='sky'?MATS.mint:MATS.green),0,-th/2,0);
     const body=new THREE.Mesh(LHSP(1,22,10),MATS.dirt);body.scale.set(w/2*.93,big?pl.th*.85:1.5,D/2*.88);addTo(g,body,0,-th-.02,0,true,.03);
     if(big){
       // spikes of rock below
       const sp=deco([[new THREE.ConeGeometry(.45,1.3,7),0x8d7461,M4(-w*.2,0,0,Math.PI)],[new THREE.ConeGeometry(.35,1.0,7),0x8d7461,M4(w*.18,0,.5,Math.PI)]],.03);sp.position.set(0,-pl.th-.4,0);g.add(sp)}
-    if(big&&theme==='sun'){
+    if(big&&(theme==='sun'||theme==='sky')){
       const t1=treeMesh(1.05);t1.position.set(-w*.36,0,-1.6);g.add(t1);const t2=treeMesh(.8,0x3da64f,0x6fd860);t2.position.set(w*.4,0,-1.5);g.add(t2);
       const m1=mushroomMesh(1);m1.position.set(w*.22,0,-1.7);g.add(m1);const r1=rockMesh(1.2);r1.position.set(-w*.12,0,-2);g.add(r1);
       for(let i=0;i<5;i++){const f=flowerMesh([0xff6fb5,0xffd23f,0xff8a4a,0xffffff,0xb07cff][i%5]);f.position.set(-w*.45+i*w*.2+Math.sin(i*5)*.3,0,-1.1-(i%2)*.7);g.add(f)}}
     else if(big){const t1=treeMesh(.9);t1.position.set(-w*.34,0,-1.7);g.add(t1);const f1=flowerMesh();f1.position.set(w*.3,0,-1.5);g.add(f1);const r1=rockMesh(1);r1.position.set(w*.38,0,-1.7);g.add(r1)}
-    else{const f=flowerMesh([0xffd23f,0xff6fb5,0xb07cff][pl.idx%3]);f.position.set(w*.28,0,-.7);g.add(f);const f2=flowerMesh(0xffffff);f2.position.set(-w*.3,0,-.5);g.add(f2)}
+    else{const f=flowerMesh([0xffd23f,0xff6fb5,0xb07cff][pl.idx%3]);f.position.set(w*.28,0,-.7);g.add(f);const f2=flowerMesh(0xffffff);f2.position.set(-w*.3,0,-.5);g.add(f2);
+      if(theme==='sky'){const f3=flowerMesh(0xff8a4a);f3.position.set(0,0,-.9);f3.scale.setScalar(.85);g.add(f3);const m1=mushroomMesh(.7);m1.position.set(-w*.12,0,-.95);g.add(m1);
+        const cr=deco([[new THREE.ConeGeometry(.22,.8,6),0xff8ad0,M4(-w*.18,0,.1,Math.PI)],[new THREE.ConeGeometry(.17,.6,6),0x7ae0ff,M4(w*.15,0,.2,Math.PI)]],.02);cr.position.set(0,-1.85,0);g.add(cr)}}
   }else if(k==='cloud'||k==='cloudS'){
     const big=k==='cloudS',m=new THREE.Mesh(cloudGeo(w+(big?1:0),pl.idx+3),toon(0xe3efff,{vertexColors:true}));m.castShadow=true;m.receiveShadow=true;m.position.y=big?-.35:-.3;
     g.add(m);hull(m,.04);
@@ -1153,7 +1155,7 @@ function buildStage(i){
     lava:{sky:[[0,'#3a2150'],[.55,'#c8433a'],[1,'#ffb35a']],fog:0xd9663d,hemi:0xd8896a,sun:0xffc98a,si:2.2},
     ship:{sky:[[0,'#55b5ff'],[.6,'#c2ecff'],[1,'#fff2d0']],fog:0xdff3ff,hemi:0x8fc8f0,sun:0xfff0d0,si:2.6},
     candy:{sky:[[0,'#ff9bd2'],[.55,'#ffd9ec'],[1,'#fff6c8']],fog:0xffe3f1,hemi:0xffc7e6,sun:0xfff0e0,si:2.4},
-    sky:{sky:[[0,'#3fa4ff'],[.6,'#a6e0ff'],[1,'#fff0c8']],fog:0xc9ecff,hemi:0x9ec7a0,sun:0xfff1d6,si:2.5}}[th];
+    sky:{sky:[[0,'#3f86ff'],[.5,'#8fd6ff'],[.85,'#ffe4b0'],[1,'#ffc9d6']],fog:0xd6e8ff,hemi:0x9ec7a0,sun:0xfff1d6,si:2.5}}[th];
   BGC=th==='cloud'?0x8dbcf2:0xffffff;scene.background=skyTex(pal.sky);scene.fog=new THREE.Fog(pal.fog,70,260);hemi.color.set(0xffffff);hemi.groundColor.set(pal.hemi);sun.color.set(pal.sun);sun.intensity=pal.si;
   // platforms
   plats.forEach((pl,idx)=>{const v=platVisual(pl,th);v.position.set(pl.x,pl.y,0);stageGroup.add(v);SV.plat[idx]=v});
@@ -1167,6 +1169,22 @@ function buildStage(i){
     const halo=new THREE.Mesh(new THREE.CircleGeometry(11,32),new THREE.MeshBasicMaterial({color:0xfff8d0,transparent:true,opacity:.45,fog:false}));halo.position.set(-48,38,-121);BG.add(halo);
     // cloud sea far below
     for(let k=0;k<16;k++){const m=new THREE.Mesh(cloudGeo(10,k,1),toon(BGC,{vertexColors:true}));m.position.set(-110+k*14+cr()*6,-24-cr()*5,-12-cr()*55);m.scale.setScalar(1.8+cr());BG.add(m)}
+  }
+  if(th==='sky'){
+    // sun rays fanning down from the sun
+    const rs=new THREE.Shape();rs.moveTo(0,0);rs.lineTo(-7,-170);rs.lineTo(7,-170);const rg=new THREE.ShapeGeometry(rs);
+    const rays=new THREE.Group();for(let k=0;k<9;k++){const m=new THREE.Mesh(rg,new THREE.MeshBasicMaterial({color:0xfff6c0,transparent:true,opacity:.2,depthWrite:false,fog:false}));m.rotation.z=-.85+k*.21+(k%2?.04:0);rays.add(m)}
+    rays.position.set(-48,38,-123);BG.add(rays);
+    // nearer drifting islands (bob gently)
+    for(const [x,y,z,s,f] of [[-34,-4,-30,.7,.5],[38,-9,-34,.8,.4],[-6,-16,-44,1,.3]]){const b=bgIsland(x,y,z,s);SV.bgmove.push({m:b,y0:y,f,p:x,a:.8})}
+    // hot-air balloons
+    const bc=[[0xff6fa5,0xffe14a],[0x4fc3ff,0xffffff],[0xff9a3c,0xfff1d6]];
+    [[-24,16,-26,1],[27,20,-36,1.2],[6,25,-52,1.4]].forEach(([x,y,z,s],k)=>{const g=new THREE.Group();
+      const bl=new THREE.Mesh(SP(2.2,18,12),toon(bc[k][0]));bl.scale.y=1.15;bl.position.y=3.4;g.add(bl);hull(bl,.08);
+      const st=new THREE.Mesh(new THREE.SphereGeometry(2.24,18,5,0,6.283,.38*Math.PI,.2*Math.PI),toon(bc[k][1]));st.scale.y=1.15;st.position.y=3.4;g.add(st);
+      const bk=new THREE.Mesh(BX(1.1,.8,1.1,.15),toon(0xb07a45));bk.position.y=-.2;g.add(bk);hull(bk,.05);
+      for(const sx of[-.45,.45]){const rp=new THREE.Mesh(CY(.03,.03,1.8,4),toon(0x8c5a2b));rp.position.set(sx,.95,0);g.add(rp)}
+      g.position.set(x,y,z);g.scale.setScalar(s);BG.add(g);SV.bgmove.push({m:g,y0:y,f:.6+k*.15,p:k*2,a:1.2})});
   }
   if(th==='lava'){
     // volcano
@@ -1214,6 +1232,7 @@ function updateStageVisual(dt){
   plats.forEach((pl,i)=>{const v=SV.plat[i];if(v){v.position.x=pl.x;v.position.y=pl.y}});
   // pads squish
   for(const q of SV.pads){q.m.scale.y=1+Math.sin(t*5)*.08}
+  for(const b of SV.bgmove)b.m.position.y=b.y0+Math.sin(t*b.f+b.p)*b.a;
   for(const c of SV.clouds){c.m.position.x+=c.sp*dt;if(c.m.position.x>110)c.m.position.x=-110}
   if(SV.lava){SV.lava.position.y=lavaY(t)-.02+Math.sin(t*2)*.05;SV.lava.material.map.offset.x=t*.02;SV.lava.material.map.offset.y=Math.sin(t*.3)*.05}
   if(SV.sea){SV.sea.material.map.offset.x=t*.01;SV.sea.position.y=-9.2+Math.sin(t*1.3)*.15}

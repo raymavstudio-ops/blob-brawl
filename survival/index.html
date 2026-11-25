@@ -525,7 +525,7 @@ const QUESTS=[
   {t:'Smelt iron bars',d:'Craft Iron Bars at the Furnace.',g:['craft','ingot',4],r:{xp:50}},
   {t:'Build a Forge',d:'The Forge makes iron and crystal gear. BUILD → Forge.',g:['place','forge',1],r:{xp:60,kp:10}},
   {t:'Forge an iron tool',d:'Iron tools cut and mine much faster.',g:['craftAny',['axe3','pick3','sword3'],1],r:{xp:80}},
-  {t:'Go fishing',d:'Craft a Fishing Rod. Select it, face the water, ACTION to cast, ACTION again at the bite!',g:['fish',1],r:{xp:60}},
+  {t:'Go fishing',d:'Craft a Fishing Rod. Select it, face the water, ACTION to cast, ACTION again at the bite! Follow the arrow to the 🚢 shipwreck on the beach: its chest has supplies.',g:['fish',1],r:{xp:60},loc:'ship'},
   {t:'Tame a companion',d:'Find a wild pup or fox and feed it berries or meat (ACTION).',g:['tame',1],r:{xp:80}},
   {t:'Defeat the Gloop King',d:'A boss raids on night 3, 6, 9… Be ready with a sword, armor and torches!',g:['boss',1],r:{xp:200,kp:40}},
   {t:'Brave the Frosty Peaks',d:'It is freezing up there! Craft a Fur Coat first, and bring food.',g:['visit',5],r:{xp:80},loc:'snow'},
@@ -941,7 +941,8 @@ function doorMesh(id){let d=DOORS.get(id);if(!d){const g=new THREE.Group();const
 let terrainMeshes=[],mistMesh={visible:false},spMeshes=[];
 function biomeColor(b,x,z,h,slope){
   const n=fbm(x/9,z/9,G.seed+31),n2=hash2(Math.floor(x*2),Math.floor(z*2),5);let c=BIO_COL[b].slice();
-  if(b===BIO.MEADOW){const st=(Math.floor((x+z)/8)&1)?6:-4;c=[c[0]+st+n*30-15,c[1]+st+n*24-10,c[2]+n*10]}
+  if(b===BIO.MEADOW){const st=(Math.floor((x+z)/8)&1)?6:-4;c=[c[0]+st+n*30-15,c[1]+st+n*24-10,c[2]+n*10];
+    const pt=fbm(x/15,z/15,G.seed+41);if(pt>.58){const k=Math.min(1,(pt-.58)*7);c=[c[0]+22*k,c[1]+6*k,c[2]-26*k]}else if(pt<.40){const k=Math.min(1,(.40-pt)*7);c=[c[0]-18*k,c[1]-14*k,c[2]+2*k]}}
   else if(b===BIO.FOREST){c=[c[0]+n*24-14,c[1]+n*26-12,c[2]+n*14-6]}
   else if(b===BIO.DESERT){const st=Math.sin((x*.35+z*.2)*1.4)*7;c=[c[0]+st+n*22-11,c[1]+st+n*20-10,c[2]+n*22-8];if(n2<.05)c=[c[0]-30,c[1]-30,c[2]-20]}
   else if(b===BIO.SNOW){if(slope>.5)c=[168+n*26,184+n*22,206+n*16];else c=[c[0]-n*10,c[1]-n*7,c[2]-n*2]}
@@ -972,7 +973,32 @@ function buildTerrain(){
     for(let j=cj*CH;j<(cj+1)*CH;j++)for(let i=cix*CH;i<(cix+1)*CH;i++){V(i,j);V(i,j+1);V(i+1,j);V(i+1,j+1);V(i+1,j);V(i,j+1)}
     const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));geo.setAttribute('color',new THREE.Float32BufferAttribute(col,3));geo.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));geo.computeVertexNormals();geo.computeBoundingSphere();
     const m=new THREE.Mesh(geo,mat);m.receiveShadow=true;scene.add(m);terrainMeshes.push(m)}
+  buildMeadowDecor();
 }
+
+/* ---------------- meadow scatter (decor only: instanced, no gameplay) ---------------- */
+let decorMeshes=[],decorGeo=null;
+function buildMeadowDecor(){
+  for(const m of decorMeshes){scene.remove(m);m.dispose()}decorMeshes=[];
+  if(!decorGeo){const up=(g,y)=>{g.translate(0,y,0);return g};decorGeo={tuft:up(new THREE.ConeGeometry(.07,.42,4),.21),stem:up(new THREE.CylinderGeometry(.012,.012,.3,4),.15),head:up(new THREE.SphereGeometry(.075,6,5),.33),
+    rock:up(new THREE.DodecahedronGeometry(.2,0),.08),mstem:up(new THREE.CylinderGeometry(.04,.05,.16,6),.08),mcap:up(new THREE.SphereGeometry(.12,8,5,0,Math.PI*2,0,Math.PI/2),.15),bush:up(new THREE.IcosahedronGeometry(.32,0),.22)}}
+  const R=mulberry(G.seed*17+3),T={tuft:[],stem:[],head:[],rock:[],mstem:[],mcap:[],bush:[]};
+  const tuftC=[0x62b85a,0x78cf62,0x4fa653,0x8fd66a],flC=[0xff6fb5,0xffd23f,0xffffff,0xb07cff,0xff8a4a],bushC=[0x4fb55a,0x5fc464,0x43a350],rockC=[0xa9a29a,0x9c9aa8,0xb5aea3];
+  for(let j=2;j<NC-2;j++)for(let i=2;i<NC-2;i++){
+    if(G.BI[j*NC+i]!==BIO.MEADOW)continue;const cx=cellC(i),cz=cellC(j);
+    if(G.SP.some(s=>Math.hypot(cx-s.x,cz-s.z)<s.r+1.5))continue;
+    const free=G.NG[j*NC+i]<0,pos=()=>{const x=cx+(R()-.5)*1.9,z=cz+(R()-.5)*1.9;return[x,groundH(x,z),z]};
+    if(R()<.45){const[x,y,z]=pos();for(let k=0;k<3;k++)T.tuft.push([x+(R()-.5)*.35,y,z+(R()-.5)*.35,.8+R()*.5,.7+R()*.9,.8+R()*.5,R()*6.28,tuftC[(R()*4)|0]])}
+    if(R()<.28){const[x,y,z]=pos(),c=flC[(R()*5)|0];for(let k=0;k<3;k++){const fx=x+(R()-.5)*.5,fz=z+(R()-.5)*.5,fy=groundH(fx,fz),sc=.8+R()*.5;T.stem.push([fx,fy,fz,1,sc,1,0,0x3fae4a]);T.head.push([fx,fy,fz,sc,sc,sc,0,c])}}
+    if(free&&R()<.05){const[x,y,z]=pos(),sc=.7+R()*1.1;T.rock.push([x,y,z,sc,sc*.7,sc,R()*6.28,rockC[(R()*3)|0]])}
+    if(R()<.035){const[x,y,z]=pos(),sc=.8+R()*.5,cc=R()<.6?0xff4d5e:0xffffff;T.mstem.push([x,y,z,sc,sc,sc,0,0xfff1d6]);T.mcap.push([x,y,z,sc,sc,sc,0,cc])}
+    if(free&&R()<.04){const[x,y,z]=pos(),sc=.8+R()*.6;T.bush.push([x,y,z,sc,sc*.8,sc,R()*6.28,bushC[(R()*3)|0]])}}
+  const INKS={tuft:.014,head:.02,rock:.03,mcap:.022,bush:.035};
+  for(const k in T){const L=T[k];if(!L.length)continue;const m=new THREE.InstancedMesh(decorGeo[k],WHITE,L.length);m.frustumCulled=false;m.receiveShadow=true;
+    const o=INKS[k]?new THREE.InstancedMesh(inkGeo(decorGeo[k],INKS[k]),inkMat,L.length):null;if(o)o.frustumCulled=false;
+    L.forEach((a,n)=>{_q.setFromEuler(_e.set(0,a[6],0));_m.compose(_v.set(a[0],a[1],a[2]),_q,_s.set(a[3],a[4],a[5]));m.setMatrixAt(n,_m);m.setColorAt(n,_c.set(a[7]));if(o)o.setMatrixAt(n,_m)});
+    scene.add(m);decorMeshes.push(m);if(o){scene.add(o);decorMeshes.push(o)}}
+  decorMeshes.n=Object.values(T).reduce((a,l)=>a+l.length,0)}
 
 /* ---------------- set pieces (handcrafted landmarks) ---------------- */
 function addMesh(parent,g,c,x,y,z,o={}){const m=new THREE.Mesh(g,o.mat||toon(c));m.position.set(x,y,z);if(o.s!=null)typeof o.s==='number'?m.scale.setScalar(o.s):m.scale.set(...o.s);if(o.r)m.rotation.set(...o.r);m.castShadow=o.sh!==false;m.receiveShadow=true;if(o.ink)hull(m,o.ink);parent.add(m);return m}
@@ -2033,7 +2059,9 @@ function drawDots(g,sc,ox,oy,fs){g.textAlign='center';g.textBaseline='middle';g.
 function drawBigMap(){const c=$('bigMap');if(!c)return;ensureMap();const g=c.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(mapBase,0,0,420,420);drawDots(g,420/256,0,0,18)}
 function drawMini(){const c=$('mapC');if(!c||!G)return;ensureMap();const g=c.getContext('2d'),m=me();g.clearRect(0,0,208,208);if(!m)return;const R=42,sc=208/(R*2);g.imageSmoothingEnabled=false;
   g.fillStyle='#4cc0e8';g.fillRect(0,0,208,208);g.drawImage(mapBase,(m.x+HALF)-R,(m.z+HALF)-R,R*2,R*2,0,0,208,208);
-  const ox=-(m.x+HALF-R)*sc,oy=-(m.z+HALF-R)*sc;drawDots(g,sc,ox,oy,22);$('mapC').style.transform=`rotate(${S.camYaw}rad)`}
+  const ox=-(m.x+HALF-R)*sc,oy=-(m.z+HALF-R)*sc;drawDots(g,sc,ox,oy,22);
+  {const sp=G.SP.find(s=>s.k==='ship');if(sp&&!(W.opened&&W.opened.ship)){const ddx=sp.x-m.x,ddz=sp.z-m.z,dd=Math.hypot(ddx,ddz);if(dd>R*.8){const k=R*.8/dd;g.font='24px sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText('🚢',(m.x+ddx*k+HALF)*sc+ox,(m.z+ddz*k+HALF)*sc+oy)}}}
+  $('mapC').style.transform=`rotate(${S.camYaw}rad)`}
 $('pbody').addEventListener('click',e=>{const t=e.target;
   const rc=t.closest('[data-ri]');if(rc){craftRecipe(+rc.dataset.ri);return}
   const bp=t.closest('[data-bp]');if(bp){enterBuild(bp.dataset.bp);return}
@@ -2376,6 +2404,7 @@ function catchFish(){const r=Math.random();let item='fish',n=1;if(r<.08){item='g
   grant([[item,n]]);addXp(6);C.stats.fish=(C.stats.fish||0)+1;weekly('fish');request({k:'stat',fish:1});if(C.stats.fish>=15)unlockHat('angler');SFX.pop();const m=me();floatText(m.x,m.y+2,m.z,'🐟 +'+n,'#fff',22)}
 /* quest arrow */
 function qLocOf(q){const m=me();if(!q||!q.loc||!m)return null;const L=q.loc;
+  if(L==='ship'){const s=G.SP.find(s=>s.k==='ship');return s&&!(W.opened&&W.opened.ship)?s:null}
   if(L==='desert')return G.desertC;if(L==='snow')return G.snowC;if(L==='volcano')return G.volcC;if(L==='crater')return G.crater;
   if(L==='crypt'){const s=G.SP.find(s=>s.k==='crypt');return s&&!(W.opened.crypt&&W.opened.crypt2)?s:null}
   if(L.startsWith('node:')){const k=L.slice(5);let bd=1e9,b=null;const i0=cellOf(m.x),j0=cellOf(m.z);

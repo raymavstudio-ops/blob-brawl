@@ -1297,6 +1297,7 @@ function renderMenu(){
   else if(menuTab==='save'){h=`<div class="row2"><button class="btn green" id="mSave">💾 SAVE NOW</button><button class="switch ${muted?'':'on'}" id="mSound" style="margin-top:10px"><span>Sound &amp; music</span><span class="t"></span></button></div>
     <div class="g2"><div><label>Export save (move to another phone)</label><textarea id="mExp" readonly></textarea><button class="btn ghost" id="mCopy">📋 COPY SAVE CODE</button></div>
     <div><label>Import save code</label><textarea id="mImp" placeholder="Paste a CQ1: save code here"></textarea><button class="btn blue" id="mLoad">📥 LOAD SAVE CODE</button></div></div>
+    <button class="btn blue" id="mQuit" style="margin-top:12px">🏠 Save &amp; quit to title</button>
     <button class="btn ghost" id="mReset" style="margin-top:12px">🗑 Start a new adventure</button>`}
   b.innerHTML=h;
   if(menuTab==='save')$('mExp').value=exportCode();
@@ -1313,6 +1314,7 @@ $('menu').addEventListener('click',e=>{
   else if(id==='mShare'){SFX.click();shareLink()}
   else if(id==='mLeave'){SFX.click();netLeave(true);renderMenu()}
   else if(id==='mSave'){const ok=saveGame();toast(ok?'Game saved! ✓':'Could not save (storage blocked)');SFX.coin()}
+  else if(id==='mQuit'){SFX.click();const bt=$('mQuit');if(bt.dataset.arm&&Date.now()-bt.dataset.arm<3000){saveGame();try{netLeave(true)}catch(e){}location.replace(location.pathname+location.search)}else{bt.dataset.arm=Date.now();bt.innerHTML='Tap again to save &amp; quit';setTimeout(()=>{if($('mQuit')===bt&&bt.dataset.arm){delete bt.dataset.arm;bt.innerHTML='🏠 Save &amp; quit to title'}},3000)}}
   else if(id==='mSound'){$('mute').click();renderMenu()}
   else if(id==='mCopy'){const v=$('mExp').value;if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(v).then(()=>toast('Save code copied!'),()=>{$('mExp').select();toast('Select & copy the code')});else{$('mExp').select();try{document.execCommand('copy');toast('Save code copied!')}catch(e){toast('Select & copy the code')}}}
   else if(id==='mLoad'){const s=importCode($('mImp').value);if(!s){toast('That save code is not valid');return}
